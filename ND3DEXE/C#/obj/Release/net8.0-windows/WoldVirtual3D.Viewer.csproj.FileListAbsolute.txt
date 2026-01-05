@@ -42,3 +42,5 @@ D:\woldvirtual3d\ND3DEXE\C#\obj\Release\net8.0-windows\refint\WoldVirtual3D.View
 D:\woldvirtual3d\ND3DEXE\C#\obj\Release\net8.0-windows\WoldVirtual3D.Viewer.pdb
 D:\woldvirtual3d\ND3DEXE\C#\obj\Release\net8.0-windows\WoldVirtual3D.Viewer.genruntimeconfig.cache
 D:\woldvirtual3d\ND3DEXE\C#\obj\Release\net8.0-windows\ref\WoldVirtual3D.Viewer.dll
+D:\woldvirtual3d\ND3DEXE\C#\bin\Release\net8.0-windows\System.Management.dll
+D:\woldvirtual3d\ND3DEXE\C#\bin\Release\net8.0-windows\runtimes\win\lib\net8.0\System.Management.dll

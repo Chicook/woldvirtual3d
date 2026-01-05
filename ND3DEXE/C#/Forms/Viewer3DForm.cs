@@ -3,6 +3,10 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 using WoldVirtual3D.Viewer;
+using WoldVirtual3D.Viewer.Forms.Registration;
+using WoldVirtual3D.Viewer.RegistroPC;
+using WoldVirtual3D.Viewer.RegistroPC.Models;
+using WoldVirtual3D.Viewer.Services;
 
 namespace WoldVirtual3D.Viewer.Forms
 {
@@ -17,12 +21,16 @@ namespace WoldVirtual3D.Viewer.Forms
         private Viewer3D? _viewer3D;
         private LoginManager? _loginManager;
         private UserDatabase? _userDatabase;
+        private HardwareRegistrationService? _hardwareRegistrationService;
+        private UserDataStorage? _userDataStorage;
+        private string _currentHardwareHash = "";
+        private string _selectedAvatar = "";
 
         public Viewer3DForm()
         {
             InitializeComponent();
             InitializeServices();
-            ShowLoginPanel();
+            _ = CheckHardwareRegistrationAsync();
         }
 
         private void InitializeComponent()
@@ -40,7 +48,9 @@ namespace WoldVirtual3D.Viewer.Forms
         {
             try
             {
+                _hardwareRegistrationService = new HardwareRegistrationService();
                 _userDatabase = new UserDatabase();
+                _userDataStorage = new UserDataStorage();
                 _loginManager = new LoginManager(_userDatabase);
                 _loginManager.OnLoginSuccess += OnLoginSuccess;
                 _loginManager.OnLoginFailed += OnLoginFailed;
@@ -49,6 +59,126 @@ namespace WoldVirtual3D.Viewer.Forms
             {
                 MessageBox.Show($"Error al inicializar servicios: {ex.Message}", "Error", 
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async Task CheckHardwareRegistrationAsync()
+        {
+            try
+            {
+                if (_hardwareRegistrationService == null) return;
+
+                var validation = await _hardwareRegistrationService.ValidateHardwareAsync();
+                
+                if (!validation.IsValid || validation.RequiresRegistration)
+                {
+                    ShowPCRegistration();
+                }
+                else
+                {
+                    ShowLoginPanel();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error verificando registro de hardware: {ex.Message}");
+                ShowPCRegistration();
+            }
+        }
+
+        private void ShowPCRegistration()
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke((MethodInvoker)delegate { ShowPCRegistration(); });
+                return;
+            }
+
+            using (var pcRegistrationForm = new PCRegistrationForm())
+            {
+                var result = pcRegistrationForm.ShowDialog(this);
+                
+                if (result == DialogResult.OK)
+                {
+                    _currentHardwareHash = pcRegistrationForm.HardwareHash ?? "";
+                    ShowAvatarSelection();
+                }
+                else
+                {
+                    this.Close();
+                }
+            }
+        }
+
+        private void ShowAvatarSelection()
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke((MethodInvoker)delegate { ShowAvatarSelection(); });
+                return;
+            }
+
+            using (var avatarForm = new AvatarSelectionForm())
+            {
+                var result = avatarForm.ShowDialog(this);
+                
+                if (result == DialogResult.OK)
+                {
+                    _selectedAvatar = avatarForm.SelectedAvatar;
+                    ShowUserRegistration();
+                }
+                else
+                {
+                    this.Close();
+                }
+            }
+        }
+
+        private void ShowUserRegistration()
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke((MethodInvoker)delegate { ShowUserRegistration(); });
+                return;
+            }
+
+            using (var userRegForm = new UserRegistrationForm())
+            {
+                userRegForm.RegistrationCompleted += async (s, data) =>
+                {
+                    if (_loginManager != null && _userDatabase != null && _userDataStorage != null)
+                    {
+                        var success = await _loginManager.RegisterAsync(data.Username, data.Password);
+                        if (success)
+                        {
+                            var hardwareInfo = await _hardwareRegistrationService?.GetStoredHardwareHashAsync();
+                            
+                            var userData = new UserRegistrationData
+                            {
+                                Username = data.Username,
+                                PasswordHash = data.Password,
+                                AccountHash = data.AccountHash,
+                                HardwareHash = _currentHardwareHash,
+                                SelectedAvatar = _selectedAvatar,
+                                RegistrationDate = DateTime.UtcNow
+                            };
+
+                            await _userDataStorage.SaveUserDataMainAsync(userData);
+                            System.Diagnostics.Debug.WriteLine($"Usuario registrado: {data.Username}, Hash: {data.AccountHash}");
+                        }
+                    }
+                };
+
+                var result = userRegForm.ShowDialog(this);
+                
+                if (result == DialogResult.OK)
+                {
+                    ShowLoginPanel();
+                }
+                else
+                {
+                    this.Close();
+                }
             }
         }
 
