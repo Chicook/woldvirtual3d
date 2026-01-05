@@ -323,6 +323,14 @@ python -m uvicorn main:app --reload
 - 🔴 **Tests con JSX en .ts**: 71 errores (archivos sin extensión .tsx)
 - 🟡 **Sintaxis Menores**: 11 errores (llaves sin cerrar, etiquetas incompletas)
 
+## ⚠️ Warnings Conocidos
+
+### Warnings de Godot Engine (Internos)
+
+- ⚠️ **`instance_reset_physics_interpolation() is deprecated`**: Warning interno de Godot que proviene del código de compatibilidad (C++). No afecta la funcionalidad del proyecto y se puede ignorar de forma segura. Se resolverá en futuras versiones de Godot.
+
+**Para más información**: Ver [docs/KNOWN_WARNINGS.md](docs/KNOWN_WARNINGS.md)
+
 ---
 
 ## 📝 Estándares de Desarrollo
