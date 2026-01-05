@@ -1,0 +1,109 @@
+[gd_scene load_steps=20 format=3 uid="uid://ci8vo3dw7syx1"]
+
+[ext_resource type="Shader" uid="uid://db5082ytd2oyi" path="res://SHADER/AGUAanimada_shader.gdshader" id="3_82wcn"]
+[ext_resource type="Terrain3DAssets" uid="uid://b8k3j2h4m5n6p" path="res://escenas/terrainUS1_assets.tres" id="5_assets"]
+
+[sub_resource type="Gradient" id="Gradient_4sfxj"]
+offsets = PackedFloat32Array(0.2, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_iiepc"]
+noise_type = 2
+frequency = 0.03
+cellular_jitter = 3.0
+cellular_return_type = 0
+domain_warp_enabled = true
+domain_warp_type = 1
+domain_warp_amplitude = 50.0
+domain_warp_fractal_type = 2
+domain_warp_fractal_lacunarity = 1.5
+domain_warp_fractal_gain = 1.0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_c0rt6"]
+noise = SubResource("FastNoiseLite_iiepc")
+color_ramp = SubResource("Gradient_4sfxj")
+seamless = true
+
+[sub_resource type="Terrain3DMaterial" id="Terrain3DMaterial_82wcn"]
+_shader_parameters = {
+&"bias_distance": 512.0,
+&"blend_sharpness": 0.5,
+&"depth_blur": 0.0,
+&"enable_macro_variation": true,
+&"enable_projection": true,
+&"flat_terrain_normals": false,
+&"macro_variation1": Color(1, 1, 1, 1),
+&"macro_variation2": Color(1, 1, 1, 1),
+&"macro_variation_slope": 0.333,
+&"mipmap_bias": 1.0,
+&"noise1_angle": 0.0,
+&"noise1_offset": Vector2(0.5, 0.5),
+&"noise1_scale": 0.04,
+&"noise2_scale": 0.076,
+&"noise_texture": SubResource("NoiseTexture2D_c0rt6"),
+&"projection_threshold": 0.8
+}
+world_background = 0
+
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_2ra60"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_sc274"]
+sky_material = SubResource("ProceduralSkyMaterial_2ra60")
+
+[sub_resource type="Environment" id="Environment_femws"]
+background_mode = 2
+sky = SubResource("Sky_sc274")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_ic2pi"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_vwy7w"]
+noise = SubResource("FastNoiseLite_ic2pi")
+seamless = true
+as_normal_map = true
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_5idyi"]
+noise = SubResource("FastNoiseLite_ic2pi")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1mcdc"]
+render_priority = 0
+shader = ExtResource("3_82wcn")
+shader_parameter/albedo = Color(0.047058824, 0.31764707, 0.46666667, 0.5058824)
+shader_parameter/roughness = 0.0
+shader_parameter/metallic_texture_channel = Vector4(1, 0, 0, 0)
+shader_parameter/specular = 0.5
+shader_parameter/metallic = 0.0
+shader_parameter/texture_refraction = SubResource("NoiseTexture2D_5idyi")
+shader_parameter/refraction = 0.05
+shader_parameter/refraction_texture_channel = Vector4(1, 0, 0, 0)
+shader_parameter/texture_normal = SubResource("NoiseTexture2D_vwy7w")
+shader_parameter/normal_scale = 1.0
+shader_parameter/uv1_scale = Vector3(6, 6, 6)
+shader_parameter/uv1_offset = Vector3(0, 0, 0)
+shader_parameter/island_center = Vector2(0, 0)
+shader_parameter/island_radius = 12.0
+shader_parameter/island_falloff = 5.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_c0rt6"]
+material = SubResource("ShaderMaterial_1mcdc")
+
+[node name="Terrain3D" type="Terrain3D"]
+data_directory = "res://escenas/dts1"
+material = SubResource("Terrain3DMaterial_82wcn")
+assets = ExtResource("5_assets")
+top_level = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_femws")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.89399326, -0.4480793, -0.0010189562, -0.0025846954, 0.0028828783, 0.99999255, -0.44807303, 0.8939891, -0.0037354166, 0, 188.51163, 0)
+shadow_enabled = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(510.69772, 0, 0, 0, 19.572472, 0, 0, 0, 512.7478, 0, 3.40168, 0)
+mesh = SubResource("BoxMesh_c0rt6")
