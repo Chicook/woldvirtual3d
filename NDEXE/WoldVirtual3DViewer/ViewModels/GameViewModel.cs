@@ -1,5 +1,7 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
 using WoldVirtual3DViewer.Models;
@@ -8,6 +10,14 @@ using WoldVirtual3DViewer.Utils;
 
 namespace WoldVirtual3DViewer.ViewModels
 {
+    public class ChatMessageItem
+    {
+        public string Sender { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
+        public string FullText => $"{Sender}: {Content}";
+        public string Color { get; set; } = "White"; // Para binding
+    }
+
     public class GameViewModel : ViewModelBase
     {
         private readonly GodotService _godotService;
@@ -17,6 +27,9 @@ namespace WoldVirtual3DViewer.ViewModels
         private Process? _godotProcess;
         private IntPtr _godotHandle = IntPtr.Zero;
         private Control? _hostControl; // El control de WinForms que aloja a Godot
+
+        // Acción para devolver el foco a la vista (se asignará desde la vista)
+        public Action? RequestFocusToGame { get; set; }
 
         private string _statusText = "Cargando Metaverso...";
         public string StatusText
@@ -39,8 +52,19 @@ namespace WoldVirtual3DViewer.ViewModels
             set => SetProperty(ref _chatMessage, value);
         }
 
+        // Colección para mensajes temporales
+        public ObservableCollection<ChatMessageItem> ChatHistory { get; } = new ObservableCollection<ChatMessageItem>();
+
+        private bool _isChatVisible = true;
+        public bool IsChatVisible
+        {
+            get => _isChatVisible;
+            set => SetProperty(ref _isChatVisible, value);
+        }
+
         public ICommand GoBackCommand { get; }
         public ICommand SendChatCommand { get; }
+        public ICommand ToggleChatCommand { get; }
 
         public GameViewModel(GodotService godotService, RegistrationContext registrationContext, INavigationService navigationService)
         {
@@ -50,15 +74,79 @@ namespace WoldVirtual3DViewer.ViewModels
 
             GoBackCommand = new RelayCommand(GoBack);
             SendChatCommand = new RelayCommand(SendChat);
+            ToggleChatCommand = new RelayCommand(ToggleChat);
+
+            // Mensaje de bienvenida
+            AddTimedMessage("Sistema", "Bienvenido a WoldVirtual3D.", "#AAAAAA");
+            AddTimedMessage("[Global]", "Conectado al nodo principal.", "#AAAAAA");
+        }
+
+        private void ToggleChat()
+        {
+            IsChatVisible = !IsChatVisible;
+            RequestFocusToGame?.Invoke(); // Devolver foco al juego al cerrar/abrir
         }
 
         private void SendChat()
         {
             if (string.IsNullOrWhiteSpace(ChatMessage)) return;
-            // Aquí iría la lógica de envío real (socket, api, godot bridge)
-            // Por ahora solo limpiamos
-            StatusText = $"Chat enviado: {ChatMessage}";
+            
+            // Añadir mensaje al historial
+            var msg = new ChatMessageItem 
+            { 
+                Sender = "Yo", 
+                Content = ChatMessage, 
+                Color = "#FFFFFF" // Blanco para mis mensajes
+            };
+            
+            // Usar Application.Current.Dispatcher para asegurar hilo UI si es necesario
+            if (System.Windows.Application.Current != null)
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(() => ChatHistory.Add(msg));
+            }
+            else
+            {
+                ChatHistory.Add(msg);
+            }
+
             ChatMessage = string.Empty;
+
+            // Devolver foco al juego
+            RequestFocusToGame?.Invoke();
+        }
+
+        private void AddTimedMessage(string sender, string content, string color)
+        {
+            var msg = new ChatMessageItem { Sender = sender, Content = content, Color = color };
+            
+            // Ejecutar en UI Thread si es necesario (ObservableCollection)
+            // Asumimos que estamos en UI Thread o usamos BindingOperations.EnableCollectionSynchronization
+            // Pero como esto es ViewModel puro, vamos a confiar en el dispatcher de WPF o hacerlo simple.
+            // Para seguridad, usamos App.Current.Dispatcher si existe.
+            if (System.Windows.Application.Current != null)
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(() => ChatHistory.Add(msg));
+            }
+            else
+            {
+                ChatHistory.Add(msg);
+            }
+
+            // Eliminar tras 35 segundos
+            _ = RemoveMessageAfterDelay(msg, 35000);
+        }
+
+        private async Task RemoveMessageAfterDelay(ChatMessageItem msg, int delayMs)
+        {
+            await Task.Delay(delayMs);
+            if (System.Windows.Application.Current != null)
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(() => ChatHistory.Remove(msg));
+            }
+            else
+            {
+                ChatHistory.Remove(msg);
+            }
         }
 
         public void InitializeGame(Control hostControl)
