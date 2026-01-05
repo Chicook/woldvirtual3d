@@ -81,10 +81,34 @@ namespace WoldVirtual3DViewer.ViewModels
             AddTimedMessage("[Global]", "Conectado al nodo principal.", "#AAAAAA");
         }
 
+        public void FocusGame()
+        {
+            // 1. Foco a nivel de WPF/WinForms (View)
+            RequestFocusToGame?.Invoke();
+            
+            // 2. Foco explícito a la ventana de Godot (Win32)
+            if (_godotHandle != IntPtr.Zero)
+            {
+                _godotService.FocusWindow(_godotHandle);
+            }
+        }
+
         private void ToggleChat()
         {
             IsChatVisible = !IsChatVisible;
-            RequestFocusToGame?.Invoke(); // Devolver foco al juego al cerrar/abrir
+            FocusGame(); // Devolver foco al juego al cerrar/abrir
+        }
+
+        private void RunOnUIThread(Action action)
+        {
+            if (System.Windows.Application.Current != null)
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(action);
+            }
+            else
+            {
+                action();
+            }
         }
 
         private void SendChat()
@@ -99,38 +123,19 @@ namespace WoldVirtual3DViewer.ViewModels
                 Color = "#FFFFFF" // Blanco para mis mensajes
             };
             
-            // Usar Application.Current.Dispatcher para asegurar hilo UI si es necesario
-            if (System.Windows.Application.Current != null)
-            {
-                System.Windows.Application.Current.Dispatcher.Invoke(() => ChatHistory.Add(msg));
-            }
-            else
-            {
-                ChatHistory.Add(msg);
-            }
+            RunOnUIThread(() => ChatHistory.Add(msg));
 
             ChatMessage = string.Empty;
 
             // Devolver foco al juego
-            RequestFocusToGame?.Invoke();
+            FocusGame();
         }
 
         private void AddTimedMessage(string sender, string content, string color)
         {
             var msg = new ChatMessageItem { Sender = sender, Content = content, Color = color };
             
-            // Ejecutar en UI Thread si es necesario (ObservableCollection)
-            // Asumimos que estamos en UI Thread o usamos BindingOperations.EnableCollectionSynchronization
-            // Pero como esto es ViewModel puro, vamos a confiar en el dispatcher de WPF o hacerlo simple.
-            // Para seguridad, usamos App.Current.Dispatcher si existe.
-            if (System.Windows.Application.Current != null)
-            {
-                System.Windows.Application.Current.Dispatcher.Invoke(() => ChatHistory.Add(msg));
-            }
-            else
-            {
-                ChatHistory.Add(msg);
-            }
+            RunOnUIThread(() => ChatHistory.Add(msg));
 
             // Eliminar tras 35 segundos
             _ = RemoveMessageAfterDelay(msg, 35000);
@@ -139,14 +144,7 @@ namespace WoldVirtual3DViewer.ViewModels
         private async Task RemoveMessageAfterDelay(ChatMessageItem msg, int delayMs)
         {
             await Task.Delay(delayMs);
-            if (System.Windows.Application.Current != null)
-            {
-                System.Windows.Application.Current.Dispatcher.Invoke(() => ChatHistory.Remove(msg));
-            }
-            else
-            {
-                ChatHistory.Remove(msg);
-            }
+            RunOnUIThread(() => ChatHistory.Remove(msg));
         }
 
         public void InitializeGame(Control hostControl)

@@ -36,12 +36,14 @@ d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\bin\Release\net8.0-windows\runtimes\w
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\WoldVirtual3DViewer.csproj.AssemblyReference.cache
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\Themes\DarkTheme.baml
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\Views\AvatarSelectionView.baml
+d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\Views\GameOverlayWindow.baml
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\Views\GameView.baml
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\Views\LoadingView.baml
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\Views\LoginView.baml
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\Views\PCRegistrationView.baml
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\Views\UserRegistrationView.baml
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\Views\AvatarSelectionView.g.cs
+d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\Views\GameOverlayWindow.g.cs
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\Views\GameView.g.cs
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\Views\LoadingView.g.cs
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\Views\LoginView.g.cs
@@ -66,5 +68,3 @@ d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\refint\Wol
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\WoldVirtual3DViewer.pdb
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\WoldVirtual3DViewer.genruntimeconfig.cache
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\ref\WoldVirtual3DViewer.dll
-d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\Views\GameOverlayWindow.baml
-d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\Views\GameOverlayWindow.g.cs

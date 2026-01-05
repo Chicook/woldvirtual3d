@@ -50,8 +50,8 @@ namespace WoldVirtual3DViewer.Views
         {
             if (DataContext is GameViewModel vm)
             {
-                // Invocar la acción definida en el ViewModel para devolver el foco
-                vm.RequestFocusToGame?.Invoke();
+                // Invocar el método robusto de foco
+                vm.FocusGame();
             }
         }
 

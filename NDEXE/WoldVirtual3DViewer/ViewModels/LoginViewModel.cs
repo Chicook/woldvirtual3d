@@ -84,42 +84,5 @@ namespace WoldVirtual3DViewer.ViewModels
                 System.Windows.MessageBox.Show(ex.Message);
             }
         }
-
-        private async Task LaunchGodotAsync(UserAccount account)
-        {
-            try 
-            {
-                if (!_godotService.IsGodotAvailable())
-                {
-                    // Manual search logic
-                    if (System.Windows.MessageBox.Show("No se encuentra Godot.exe. ¿Buscar manualmente?", "Godot", System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.Yes)
-                    {
-                        var dialog = new Microsoft.Win32.OpenFileDialog { Filter = "Godot.exe|*.exe" };
-                        if (dialog.ShowDialog() == true)
-                        {
-                            _godotService.SetGodotExecutablePath(dialog.FileName);
-                        }
-                        else return;
-                    }
-                    else return;
-                }
-
-                if (!_godotService.IsProjectValid())
-                {
-                    System.Windows.MessageBox.Show("No se encuentra el proyecto (project.godot).");
-                    return;
-                }
-
-                bool launched = await _godotService.LaunchGodotSceneAsync(account);
-                if (launched)
-                {
-                    System.Windows.Application.Current.Shutdown();
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show($"Error al lanzar Godot: {ex.Message}");
-            }
-        }
     }
 }

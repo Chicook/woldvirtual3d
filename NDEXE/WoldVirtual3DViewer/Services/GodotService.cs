@@ -26,6 +26,12 @@ namespace WoldVirtual3DViewer.Services
         [DllImport("user32.dll")]
         private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
 
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr SetFocus(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
         private const int GWL_STYLE = -16;
         private const int WS_VISIBLE = 0x10000000;
         private const int WS_CHILD = 0x40000000;
@@ -206,11 +212,21 @@ namespace WoldVirtual3DViewer.Services
             MoveWindow(childHandle, 0, 0, width, height, true);
         }
 
-        // Mantener compatibilidad (aunque ya no se usará tanto directamente)
+        public void FocusWindow(IntPtr hWnd)
+        {
+            if (hWnd != IntPtr.Zero)
+            {
+                // Intentar dar foco explícito a la ventana de Win32
+                SetFocus(hWnd);
+                // Opcional: Traer al frente si es necesario, aunque al estar embebida
+                // SetFocus suele ser suficiente si el padre tiene foco.
+            }
+        }
+
+        // Mantener compatibilidad (Obsoleto)
+        [Obsolete("Use LaunchGodotForEmbeddingAsync instead")]
         public async Task<bool> LaunchGodotSceneAsync(UserAccount userAccount)
         {
-            // ... (Implementación legacy o redirigir)
-            // Por simplicidad, dejamos la implementación anterior o lanzamos en ventana separada si falla el embedding.
             var p = await LaunchGodotForEmbeddingAsync(userAccount);
             return p != null && !p.HasExited;
         }
