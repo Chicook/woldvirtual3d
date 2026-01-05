@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using WoldVirtual3DViewer.Models;
 
 namespace WoldVirtual3DViewer.ViewModels
@@ -32,8 +33,8 @@ namespace WoldVirtual3DViewer.ViewModels
         public bool IsUserRegistered => _mainViewModel.IsUserRegistered;
 
         // Comandos delegados
-        public System.Windows.Input.ICommand RegisterUserCommand => _mainViewModel.RegisterUserCommand;
-        public System.Windows.Input.ICommand DownloadUserHashCommand => _mainViewModel.DownloadUserHashCommand;
+        public ICommand RegisterUserCommand => _mainViewModel.RegisterUserCommand;
+        public ICommand DownloadUserHashCommand => _mainViewModel.DownloadUserHashCommand;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

@@ -1,5 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using WoldVirtual3DViewer.Models;
 
 namespace WoldVirtual3DViewer.ViewModels
 {
@@ -22,14 +24,13 @@ namespace WoldVirtual3DViewer.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-    }
 
         // Notificar cambios cuando cambie el estado en MainViewModel
         public void NotifyStateChanged()
         {
             OnPropertyChanged(nameof(PCInfo));
-            OnPropertyChanged(nameof(PCRegistrationStatus));
-            OnPropertyChanged(nameof(IsPCRegistered));
+            OnPropertyChanged(nameof(RegistrationStatus));
+            OnPropertyChanged(nameof(IsRegistered));
         }
     }
 }
