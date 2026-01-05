@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace WoldVirtual3D.Viewer
 {
@@ -36,7 +37,7 @@ namespace WoldVirtual3D.Viewer
             
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                System.Diagnostics.Debug.WriteLine($"[LoginManager] Usuario o contraseña vacíos");
+                MessageBox.Show("Usuario y contraseña requeridos", "Debug", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 OnLoginFailed?.Invoke("Usuario y contrasena requeridos");
                 return false;
             }
@@ -45,17 +46,17 @@ namespace WoldVirtual3D.Viewer
             {
                 if (_userDatabase == null)
                 {
-                    System.Diagnostics.Debug.WriteLine($"[LoginManager] Base de datos no inicializada");
+                    MessageBox.Show("Base de datos no inicializada", "Debug Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     OnLoginFailed?.Invoke("Base de datos no inicializada");
                     return false;
                 }
 
-                System.Diagnostics.Debug.WriteLine($"[LoginManager] Llamando a AuthenticateUserAsync...");
+                MessageBox.Show($"Intentando autenticar usuario: {username}", "Debug", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 var user = await _userDatabase.AuthenticateUserAsync(username, password);
                 
                 if (user != null)
                 {
-                    System.Diagnostics.Debug.WriteLine($"[LoginManager] Autenticación exitosa para: {username}");
+                    MessageBox.Show($"Autenticación exitosa para: {username}", "Debug Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     _isAuthenticated = true;
                     _currentUserId = user.Id;
                     _currentUsername = user.Username;
@@ -67,15 +68,14 @@ namespace WoldVirtual3D.Viewer
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine($"[LoginManager] Autenticación fallida - credenciales inválidas");
+                    MessageBox.Show($"Autenticación fallida para: {username}\n\nEl usuario no fue encontrado o la contraseña es incorrecta.", "Debug Failure", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     OnLoginFailed?.Invoke("Credenciales invalidas");
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[LoginManager] Excepción durante login: {ex.Message}");
-                System.Diagnostics.Debug.WriteLine($"[LoginManager] StackTrace: {ex.StackTrace}");
+                MessageBox.Show($"Excepción durante login: {ex.Message}\n\nStackTrace: {ex.StackTrace}", "Debug Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 OnLoginFailed?.Invoke($"Error del sistema: {ex.Message}");
                 return false;
             }

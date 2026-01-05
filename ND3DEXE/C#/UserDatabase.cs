@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.Text;
+using System.Windows.Forms;
 
 namespace WoldVirtual3D.Viewer
 {
@@ -161,7 +162,7 @@ namespace WoldVirtual3D.Viewer
                             cmd.ExecuteNonQuery();
                         }
 
-                        System.Diagnostics.Debug.WriteLine($"[UserDatabase] Usuario creado exitosamente: {username}, ID: {userId}");
+                        MessageBox.Show($"Usuario creado exitosamente:\n\nUsuario: {username}\nID: {userId}", "Debug Create Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         return userId;
                     }
                 }
@@ -204,14 +205,13 @@ namespace WoldVirtual3D.Viewer
                                 if (checkReader.Read())
                                 {
                                     var storedHash = checkReader.GetString(1);
-                                    System.Diagnostics.Debug.WriteLine($"[UserDatabase] Usuario encontrado: {username}");
-                                    System.Diagnostics.Debug.WriteLine($"[UserDatabase] Hash almacenado: {storedHash}");
-                                    System.Diagnostics.Debug.WriteLine($"[UserDatabase] Hash calculado: {passwordHash}");
-                                    System.Diagnostics.Debug.WriteLine($"[UserDatabase] Coinciden: {storedHash == passwordHash}");
+                                    var hashMatch = storedHash == passwordHash;
+                                    var msg = $"Usuario encontrado: {username}\n\nHash almacenado: {storedHash}\nHash calculado: {passwordHash}\n\nCoinciden: {hashMatch}";
+                                    MessageBox.Show(msg, "Debug Auth", MessageBoxButtons.OK, hashMatch ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
                                 }
                                 else
                                 {
-                                    System.Diagnostics.Debug.WriteLine($"[UserDatabase] Usuario NO encontrado: {username}");
+                                    MessageBox.Show($"Usuario NO encontrado en la base de datos: {username}", "Debug Auth", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                                 }
                             }
                         }
