@@ -393,6 +393,8 @@ namespace WoldVirtual3DViewer.ViewModels
         {
             try
             {
+                Logger.Log("Iniciando proceso de registro de usuario.");
+
                 // Validaciones
                 if (string.IsNullOrWhiteSpace(Username))
                 {
@@ -425,6 +427,7 @@ namespace WoldVirtual3DViewer.ViewModels
                 }
 
                 UserRegistrationStatus = "Registrando usuario...";
+                Logger.Log($"Validaciones pasadas. Usuario: {Username}");
 
                 UserAccount? createdUserAccount = null;
                 string currentAvatarType = SelectedAvatar?.Type ?? "chica";
@@ -434,21 +437,31 @@ namespace WoldVirtual3DViewer.ViewModels
 
                 await Task.Run(() =>
                 {
-                    // Crear cuenta de usuario
-                    var userAccount = new UserAccount
+                    try
                     {
-                        Username = currentUsername,
-                        AvatarType = currentAvatarType,
-                        PCUniqueHash = currentPCHash,
-                        IsValidated = true
-                    };
+                        Logger.Log("Creando cuenta de usuario en segundo plano...");
+                        // Crear cuenta de usuario
+                        var userAccount = new UserAccount
+                        {
+                            Username = currentUsername,
+                            AvatarType = currentAvatarType,
+                            PCUniqueHash = currentPCHash,
+                            IsValidated = true
+                        };
 
-                    userAccount.SetPassword(currentPassword);
-                    userAccount.GenerateAccountHash();
+                        userAccount.SetPassword(currentPassword);
+                        userAccount.GenerateAccountHash();
 
-                    // Guardar cuenta
-                    _dataService.SaveUserAccount(userAccount);
-                    createdUserAccount = userAccount;
+                        // Guardar cuenta
+                        _dataService.SaveUserAccount(userAccount);
+                        createdUserAccount = userAccount;
+                        Logger.Log("Cuenta guardada exitosamente.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError("Error en Task.Run de registro", ex);
+                        throw;
+                    }
                 });
 
                 if (createdUserAccount != null)
@@ -456,15 +469,24 @@ namespace WoldVirtual3DViewer.ViewModels
                     _userAccount = createdUserAccount;
                     IsUserRegistered = true;
                     UserRegistrationStatus = "Usuario registrado exitosamente";
+                    Logger.Log("Usuario registrado en memoria. Mostrando mensaje de éxito.");
 
                     MessageBox.Show("Usuario registrado exitosamente. Ahora puede descargar el hash de su cuenta.", "Registro Exitoso", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                    // Cambiar a vista de login
-                    CurrentView = new LoginViewModel(this);
+                    Logger.Log("Mensaje cerrado. Cambiando a vista de Login.");
+                    
+                    // Asegurar cambio de vista en el hilo de UI
+                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        CurrentView = new LoginViewModel(this);
+                    });
+                    
+                    Logger.Log("Vista cambiada a LoginViewModel.");
                 }
             }
             catch (Exception ex)
             {
+                Logger.LogError("Error en RegisterUserAsync", ex);
                 UserRegistrationStatus = $"Error: {ex.Message}";
                 MessageBox.Show($"Error al registrar usuario: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -505,69 +527,103 @@ namespace WoldVirtual3DViewer.ViewModels
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(LoginUsername) || string.IsNullOrWhiteSpace(LoginPassword))
+                Logger.Log($"Intento de login. Usuario: {LoginUsername}");
+
+                // Validación estricta de campos vacíos
+                if (string.IsNullOrWhiteSpace(LoginUsername))
                 {
-                    LoginStatus = "Usuario y contraseña son obligatorios";
+                    MessageBox.Show("Por favor, ingrese su nombre de usuario.", "Campo Requerido", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                LoginStatus = "Iniciando sesión...";
+                if (string.IsNullOrWhiteSpace(LoginPassword))
+                {
+                    MessageBox.Show("Por favor, ingrese su contraseña.", "Campo Requerido", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                LoginStatus = "Verificando credenciales...";
 
                 bool isValid = false;
+                UserAccount? userToCheck = null;
                 
                 await Task.Run(() => 
                 {
-                    // Intentar recargar usuario por si hubo cambios externos
-                    var currentAccount = _dataService.LoadUserAccount();
-                    
-                    if (currentAccount == null)
+                    try
                     {
-                         // No hay usuario registrado
-                         return;
+                        Logger.Log("Verificando credenciales en segundo plano...");
+                        // Asegurar que leemos la versión más reciente del disco
+                        userToCheck = _dataService.LoadUserAccount();
+                        
+                        if (userToCheck != null && userToCheck.IsValidated)
+                        {
+                            // Verificar coincidencia exacta de usuario y contraseña
+                            bool userMatch = string.Equals(userToCheck.Username, LoginUsername, StringComparison.OrdinalIgnoreCase);
+                            bool passMatch = userToCheck.VerifyPassword(LoginPassword);
+                            
+                            isValid = userMatch && passMatch;
+                            Logger.Log($"Resultado validación: {isValid} (UserMatch: {userMatch}, PassMatch: {passMatch})");
+                        }
+                        else
+                        {
+                            Logger.Log("Usuario no encontrado o no validado al cargar.");
+                        }
                     }
-
-                    isValid = _dataService.ValidateUserCredentials(LoginUsername, LoginPassword);
-                    if (isValid)
+                    catch (Exception ex)
                     {
-                        _userAccount = _dataService.GetValidatedUserAccount(LoginUsername);
+                        Logger.LogError("Error verificando credenciales", ex);
                     }
                 });
 
-                if (isValid && _userAccount != null)
+                if (isValid && userToCheck != null)
                 {
+                    _userAccount = userToCheck;
                     IsLoggedIn = true;
                     LoginStatus = "Inicio de sesión exitoso";
+                    Logger.Log("Login exitoso. Iniciando Godot.");
 
-                    MessageBox.Show("Inicio de sesión exitoso. Iniciando WoldVirtual3D...", "Bienvenido", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show($"Bienvenido nuevamente, {userToCheck.Username}.\nIniciando entorno 3D...", 
+                        "Acceso Concedido", MessageBoxButton.OK, MessageBoxImage.Information);
 
                     // Iniciar Godot
                     await LaunchGodotAsync();
                 }
                 else
                 {
-                    // Verificar por qué falló para dar mejor feedback
-                    var checkAccount = _dataService.LoadUserAccount();
-                    if (checkAccount == null)
+                    Logger.Log("Fallo de login. Diagnosticando causa.");
+                    // Diagnóstico detallado del fallo
+                    if (userToCheck == null)
                     {
-                        LoginStatus = "No hay ningún usuario registrado en este equipo.";
-                        MessageBox.Show("No se encontró ninguna cuenta de usuario registrada.\nPor favor, regístrese primero.", "Cuenta no encontrada", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        LoginStatus = "No se encontró cuenta de usuario.";
+                        MessageBox.Show("No hay ninguna cuenta registrada en este PC.\nPor favor, complete el registro primero.", 
+                            "Cuenta Inexistente", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
-                    else if (!string.Equals(checkAccount.Username, LoginUsername, StringComparison.OrdinalIgnoreCase))
+                    else if (!userToCheck.IsValidated)
                     {
-                        LoginStatus = "El nombre de usuario no coincide con el registrado.";
-                        MessageBox.Show($"El usuario '{LoginUsername}' no coincide con la cuenta registrada en este equipo.", "Usuario Incorrecto", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        LoginStatus = "Cuenta no validada.";
+                        MessageBox.Show("La cuenta existe pero no está validada correctamente.", 
+                            "Error de Cuenta", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    else if (!string.Equals(userToCheck.Username, LoginUsername, StringComparison.OrdinalIgnoreCase))
+                    {
+                        LoginStatus = "Usuario incorrecto.";
+                        MessageBox.Show($"El usuario '{LoginUsername}' no coincide con la cuenta registrada ('{userToCheck.Username}').", 
+                            "Usuario Incorrecto", MessageBoxButton.OK, MessageBoxImage.Warning);
                     }
                     else
                     {
                         LoginStatus = "Contraseña incorrecta.";
-                        MessageBox.Show("La contraseña ingresada es incorrecta.", "Error de Autenticación", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        MessageBox.Show("La contraseña ingresada no es válida.", 
+                            "Error de Autenticación", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
             }
             catch (Exception ex)
             {
-                LoginStatus = $"Error: {ex.Message}";
-                MessageBox.Show($"Error al iniciar sesión: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Logger.LogError("Excepción no controlada en LoginAsync", ex);
+                LoginStatus = "Error en inicio de sesión";
+                MessageBox.Show($"Ocurrió un error inesperado al iniciar sesión:\n{ex.Message}", 
+                    "Error de Sistema", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -581,31 +637,37 @@ namespace WoldVirtual3DViewer.ViewModels
 
             try
             {
+                Logger.Log("Verificando disponibilidad de Godot...");
                 if (!_godotService.IsGodotAvailable())
                 {
-                    MessageBox.Show("Godot no está disponible. Asegúrese de que esté instalado.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Logger.Log("Godot no disponible.");
+                    MessageBox.Show("Godot no está disponible. Asegúrese de que esté instalado en App/Godot/Godot.exe.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
                 if (!_godotService.IsProjectValid())
                 {
+                    Logger.Log("Proyecto Godot no válido.");
                     MessageBox.Show("El proyecto de Godot no es válido o no se encuentra.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
                 LoginStatus = "Iniciando Godot...";
+                Logger.Log("Llamando a LaunchGodotSceneAsync...");
                 bool success = await _godotService.LaunchGodotSceneAsync(_userAccount);
+                Logger.Log($"LaunchGodotSceneAsync retornó: {success}");
 
                 if (success)
                 {
-                    LoginStatus = "Godot iniciado exitosamente";
-                    await Task.Delay(1000); // Pequeña pausa antes de cerrar
-                    // Cerrar el visor ya que Godot se está ejecutando
-                    Application.Current.Shutdown();
+                    // Cerrar el visor o minimizarlo
+                    Logger.Log("Godot iniciado correctamente. Cerrando visor.");
+                    System.Windows.Application.Current.Shutdown();
                 }
             }
             catch (Exception ex)
             {
+                Logger.LogError("Error al lanzar Godot", ex);
+                LoginStatus = $"Error: {ex.Message}";
                 MessageBox.Show($"Error al iniciar Godot: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

@@ -10,6 +10,20 @@ namespace WoldVirtual3DViewer.ViewModels
         public LoginViewModel(MainViewModel mainViewModel)
         {
             _mainViewModel = mainViewModel;
+            _mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
+        }
+
+        private void MainViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            // Propagar cambios de propiedades relevantes
+            if (e.PropertyName == nameof(MainViewModel.LoginUsername))
+                OnPropertyChanged(nameof(LoginUsername));
+            else if (e.PropertyName == nameof(MainViewModel.LoginPassword))
+                OnPropertyChanged(nameof(LoginPassword));
+            else if (e.PropertyName == nameof(MainViewModel.LoginStatus))
+                OnPropertyChanged(nameof(LoginStatus));
+            else if (e.PropertyName == nameof(MainViewModel.IsLoggedIn))
+                OnPropertyChanged(nameof(IsLoggedIn));
         }
 
         // Propiedades delegadas al MainViewModel
