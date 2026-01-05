@@ -118,7 +118,15 @@ namespace WoldVirtual3DViewer.Services
         public string CreateUserAccountZip(UserAccount userAccount)
         {
             string zipFileName = $"user_account_{userAccount.AccountHash}.zip";
-            string zipFilePath = Path.Combine(_dataDirectory, zipFileName);
+            // Usar carpeta temporal
+            string tempPath = Path.GetTempPath();
+            string zipFilePath = Path.Combine(tempPath, zipFileName);
+
+            // Asegurar que el archivo no exista
+            if (File.Exists(zipFilePath))
+            {
+                try { File.Delete(zipFilePath); } catch { }
+            }
 
             using (var zipArchive = ZipFile.Open(zipFilePath, ZipArchiveMode.Create))
             {

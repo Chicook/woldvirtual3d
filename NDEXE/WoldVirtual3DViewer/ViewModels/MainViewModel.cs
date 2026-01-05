@@ -318,19 +318,29 @@ namespace WoldVirtual3DViewer.ViewModels
             {
                 PCRegistrationStatus = "Registrando PC...";
                 
+                PCInfo? localPCInfo = null;
+
                 await Task.Run(() => 
                 {
-                    PCInfo = _hardwareService.GetPCInfo();
-                    _dataService.SavePCInfo(PCInfo);
+                    localPCInfo = _hardwareService.GetPCInfo();
+                    _dataService.SavePCInfo(localPCInfo);
                 });
 
-                IsPCRegistered = true;
-                PCRegistrationStatus = "PC registrado exitosamente";
+                if (localPCInfo != null)
+                {
+                    PCInfo = localPCInfo;
+                    IsPCRegistered = true;
+                    PCRegistrationStatus = "PC registrado exitosamente";
 
-                MessageBox.Show("PC registrado exitosamente. Ahora puede descargar el hash único.", "Registro Exitoso", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("PC registrado exitosamente. Ahora puede descargar el hash único.", "Registro Exitoso", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                // Cambiar a vista de selección de avatar
-                CurrentView = new AvatarSelectionViewModel(this);
+                    // Cambiar a vista de selección de avatar
+                    CurrentView = new AvatarSelectionViewModel(this);
+                }
+                else
+                {
+                    throw new Exception("No se pudo obtener la información del PC.");
+                }
             }
             catch (Exception ex)
             {
@@ -416,32 +426,42 @@ namespace WoldVirtual3DViewer.ViewModels
 
                 UserRegistrationStatus = "Registrando usuario...";
 
+                UserAccount? createdUserAccount = null;
+                string currentAvatarType = SelectedAvatar?.Type ?? "chica";
+                string currentPCHash = PCInfo?.UniqueHash ?? string.Empty;
+                string currentUsername = Username;
+                string currentPassword = Password;
+
                 await Task.Run(() =>
                 {
                     // Crear cuenta de usuario
                     var userAccount = new UserAccount
                     {
-                        Username = Username,
-                        AvatarType = SelectedAvatar?.Type ?? "chica",
-                        PCUniqueHash = PCInfo.UniqueHash,
+                        Username = currentUsername,
+                        AvatarType = currentAvatarType,
+                        PCUniqueHash = currentPCHash,
                         IsValidated = true
                     };
 
-                    userAccount.SetPassword(Password);
+                    userAccount.SetPassword(currentPassword);
                     userAccount.GenerateAccountHash();
 
                     // Guardar cuenta
                     _dataService.SaveUserAccount(userAccount);
-                    _userAccount = userAccount;
+                    createdUserAccount = userAccount;
                 });
 
-                IsUserRegistered = true;
-                UserRegistrationStatus = "Usuario registrado exitosamente";
+                if (createdUserAccount != null)
+                {
+                    _userAccount = createdUserAccount;
+                    IsUserRegistered = true;
+                    UserRegistrationStatus = "Usuario registrado exitosamente";
 
-                MessageBox.Show("Usuario registrado exitosamente. Ahora puede descargar el hash de su cuenta.", "Registro Exitoso", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("Usuario registrado exitosamente. Ahora puede descargar el hash de su cuenta.", "Registro Exitoso", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                // Cambiar a vista de login
-                CurrentView = new LoginViewModel(this);
+                    // Cambiar a vista de login
+                    CurrentView = new LoginViewModel(this);
+                }
             }
             catch (Exception ex)
             {
