@@ -8,7 +8,7 @@ namespace WoldVirtual3DViewer.Services
 {
     public class GodotService
     {
-        private string _godotProjectPath = string.Empty;
+        private readonly string _godotProjectPath;
         private string? _godotExecutablePath;
         private readonly string _settingsPath;
 
@@ -20,13 +20,14 @@ namespace WoldVirtual3DViewer.Services
             // Determinar la ruta del proyecto Godot buscando hacia arriba
             string currentDir = baseDir;
             bool found = false;
+            string foundPath = string.Empty;
 
             // Estrategia 1: Buscar hacia arriba hasta la raíz
             while (!string.IsNullOrEmpty(currentDir))
             {
                 if (File.Exists(Path.Combine(currentDir, "project.godot")))
                 {
-                    _godotProjectPath = currentDir;
+                    foundPath = currentDir;
                     found = true;
                     break;
                 }
@@ -41,17 +42,18 @@ namespace WoldVirtual3DViewer.Services
                 string hardcodedPath = @"D:\woldvirtual3d";
                 if (File.Exists(Path.Combine(hardcodedPath, "project.godot")))
                 {
-                    _godotProjectPath = hardcodedPath;
+                    foundPath = hardcodedPath;
                     found = true;
                 }
             }
 
-            // Estrategia 3: Si todo falla, asumir que estamos en D:\woldvirtual3d si existe, aunque no veamos el archivo (permisos?)
-            // O asignar la ruta fija para que el mensaje de error sea claro.
+            // Estrategia 3: Si todo falla, asignar la ruta fija por defecto
             if (!found)
             {
-                _godotProjectPath = @"D:\woldvirtual3d";
+                foundPath = @"D:\woldvirtual3d";
             }
+
+            _godotProjectPath = foundPath;
 
             // Intentar encontrar el ejecutable de Godot localmente
             _godotExecutablePath = FindGodotExecutable();
