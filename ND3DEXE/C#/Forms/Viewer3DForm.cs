@@ -146,13 +146,18 @@ namespace WoldVirtual3D.Viewer.Forms
             {
                 userRegForm.RegistrationCompleted += async (s, data) =>
                 {
+                    System.Diagnostics.Debug.WriteLine($"[Viewer3DForm] RegistrationCompleted evento recibido");
+                    System.Console.WriteLine($"[Viewer3DForm] RegistrationCompleted evento recibido");
+                    
                     if (_loginManager != null && _userDatabase != null && _userDataStorage != null)
                     {
+                        System.Diagnostics.Debug.WriteLine($"[Viewer3DForm] Servicios disponibles, registrando usuario...");
                         var success = await _loginManager.RegisterAsync(data.Username, data.Password);
+                        
+                        System.Diagnostics.Debug.WriteLine($"[Viewer3DForm] Registro de usuario resultado: {success}");
+                        
                         if (success)
                         {
-                            var hardwareInfo = await _hardwareRegistrationService?.GetStoredHardwareHashAsync();
-                            
                             var userData = new UserRegistrationData
                             {
                                 Username = data.Username,
@@ -163,9 +168,25 @@ namespace WoldVirtual3D.Viewer.Forms
                                 RegistrationDate = DateTime.UtcNow
                             };
 
-                            await _userDataStorage.SaveUserDataMainAsync(userData);
-                            System.Diagnostics.Debug.WriteLine($"Usuario registrado: {data.Username}, Hash: {data.AccountHash}");
+                            System.Diagnostics.Debug.WriteLine($"[Viewer3DForm] Guardando datos de usuario en JSON...");
+                            System.Console.WriteLine($"[Viewer3DForm] Guardando datos de usuario en JSON...");
+                            
+                            try
+                            {
+                                await _userDataStorage.SaveUserDataMainAsync(userData);
+                                System.Diagnostics.Debug.WriteLine($"[Viewer3DForm] Usuario registrado: {data.Username}, Hash: {data.AccountHash}");
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Diagnostics.Debug.WriteLine($"[Viewer3DForm] ERROR al guardar JSON: {ex.Message}");
+                                System.Console.WriteLine($"[Viewer3DForm] ERROR al guardar JSON: {ex.Message}");
+                            }
                         }
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[Viewer3DForm] ERROR: Servicios no disponibles");
+                        System.Console.WriteLine($"[Viewer3DForm] ERROR: Servicios no disponibles");
                     }
                 };
 

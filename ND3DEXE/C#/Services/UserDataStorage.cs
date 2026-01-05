@@ -18,19 +18,27 @@ namespace WoldVirtual3D.Viewer.Services
         {
             _userVSPath = @"D:\woldvirtual3d\ND3DEXE\DTUSER\userVS";
 
-            var parentDir = Path.GetDirectoryName(_userVSPath);
-            if (parentDir != null && !Directory.Exists(parentDir))
+            try
             {
-                Directory.CreateDirectory(parentDir);
-            }
+                var parentDir = Path.GetDirectoryName(_userVSPath);
+                if (parentDir != null && !Directory.Exists(parentDir))
+                {
+                    Directory.CreateDirectory(parentDir);
+                }
 
-            if (!Directory.Exists(_userVSPath))
+                if (!Directory.Exists(_userVSPath))
+                {
+                    Directory.CreateDirectory(_userVSPath);
+                }
+
+                System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Ruta configurada: {_userVSPath}");
+                System.Console.WriteLine($"[UserDataStorage] Ruta configurada: {_userVSPath}");
+            }
+            catch (Exception ex)
             {
-                Directory.CreateDirectory(_userVSPath);
+                System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Error configurando ruta: {ex.Message}");
+                System.Console.WriteLine($"[UserDataStorage] Error configurando ruta: {ex.Message}");
             }
-
-            System.Diagnostics.Debug.WriteLine($"UserDataStorage: Ruta configurada: {_userVSPath}");
-            System.Console.WriteLine($"UserDataStorage: Ruta configurada: {_userVSPath}");
         }
 
         /// <summary>
@@ -48,15 +56,15 @@ namespace WoldVirtual3D.Viewer.Services
 
                 var json = JsonSerializer.Serialize(userData, jsonOptions);
                 var fileName = $"user_data_{userData.Username}_{DateTime.Now:yyyyMMdd_HHmmss}.json";
-                var filePath = Path.Combine(_userVSPath, fileName);
+                var filePath = Path.GetFullPath(Path.Combine(_userVSPath, fileName));
                 
                 await File.WriteAllTextAsync(filePath, json);
                 
-                System.Diagnostics.Debug.WriteLine($"Datos de usuario guardados en: {filePath}");
+                System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Datos guardados en: {filePath}");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error guardando datos de usuario: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Error guardando datos: {ex.Message}");
                 throw;
             }
         }
@@ -68,6 +76,17 @@ namespace WoldVirtual3D.Viewer.Services
         {
             try
             {
+                System.Diagnostics.Debug.WriteLine($"[UserDataStorage] SaveUserDataMainAsync llamado");
+                System.Console.WriteLine($"[UserDataStorage] SaveUserDataMainAsync llamado");
+
+                // Asegurar que el directorio existe
+                if (!Directory.Exists(_userVSPath))
+                {
+                    Directory.CreateDirectory(_userVSPath);
+                    System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Directorio creado: {_userVSPath}");
+                    System.Console.WriteLine($"[UserDataStorage] Directorio creado: {_userVSPath}");
+                }
+
                 var jsonOptions = new JsonSerializerOptions
                 {
                     WriteIndented = true,
@@ -75,19 +94,40 @@ namespace WoldVirtual3D.Viewer.Services
                 };
 
                 var json = JsonSerializer.Serialize(userData, jsonOptions);
-                var filePath = Path.GetFullPath(Path.Combine(_userVSPath, "user_data.json"));
                 
-                System.Diagnostics.Debug.WriteLine($"UserDataStorage: Intentando guardar en: {filePath}");
-                System.Console.WriteLine($"UserDataStorage: Intentando guardar en: {filePath}");
+                // Usar ruta absoluta directa sin Path.GetFullPath para evitar resolución incorrecta
+                var filePath = Path.Combine(_userVSPath, "user_data.json");
+                
+                System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Ruta base: {_userVSPath}");
+                System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Ruta completa del archivo: {filePath}");
+                System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Directorio existe: {Directory.Exists(_userVSPath)}");
+                System.Console.WriteLine($"[UserDataStorage] Ruta base: {_userVSPath}");
+                System.Console.WriteLine($"[UserDataStorage] Ruta completa del archivo: {filePath}");
+                System.Console.WriteLine($"[UserDataStorage] Directorio existe: {Directory.Exists(_userVSPath)}");
                 
                 await File.WriteAllTextAsync(filePath, json);
                 
-                System.Diagnostics.Debug.WriteLine($"Datos de usuario principales guardados en: {filePath}");
-                System.Console.WriteLine($"UserDataStorage: JSON guardado exitosamente en: {filePath}");
+                // Verificar que el archivo se guardó correctamente
+                var fileExists = File.Exists(filePath);
+                if (fileExists)
+                {
+                    var fileInfo = new FileInfo(filePath);
+                    System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Archivo guardado exitosamente. Tamaño: {fileInfo.Length} bytes");
+                    System.Console.WriteLine($"[UserDataStorage] JSON guardado exitosamente en: {filePath}");
+                    System.Console.WriteLine($"[UserDataStorage] Tamaño del archivo: {fileInfo.Length} bytes");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"[UserDataStorage] ERROR: El archivo no existe después de guardarlo");
+                    System.Console.WriteLine($"[UserDataStorage] ERROR: El archivo no existe después de guardarlo");
+                }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error guardando datos de usuario principales: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[UserDataStorage] ERROR guardando: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[UserDataStorage] StackTrace: {ex.StackTrace}");
+                System.Console.WriteLine($"[UserDataStorage] ERROR guardando: {ex.Message}");
+                System.Console.WriteLine($"[UserDataStorage] StackTrace: {ex.StackTrace}");
                 throw;
             }
         }
@@ -99,7 +139,7 @@ namespace WoldVirtual3D.Viewer.Services
         {
             try
             {
-                var filePath = Path.Combine(_userVSPath, "user_data.json");
+                var filePath = Path.GetFullPath(Path.Combine(_userVSPath, "user_data.json"));
                 
                 if (!File.Exists(filePath))
                 {

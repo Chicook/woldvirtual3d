@@ -23,7 +23,6 @@ namespace WoldVirtual3D.Viewer
             try
             {
                 var mainForm = new Viewer3DForm();
-                EnsureFormVisible(mainForm);
                 Application.Run(mainForm);
             }
             catch (Exception ex)
@@ -57,14 +56,6 @@ namespace WoldVirtual3D.Viewer
             Application.SetCompatibleTextRenderingDefault(false);
         }
 
-        private static void EnsureFormVisible(Form form)
-        {
-            form.Visible = true;
-            form.Show();
-            form.BringToFront();
-            form.Focus();
-            form.WindowState = FormWindowState.Normal;
-        }
 
         private static void LogError(string category, Exception ex)
         {
