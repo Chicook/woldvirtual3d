@@ -29,6 +29,10 @@ namespace WoldVirtual3DViewer.Views
                     var w = Window.GetWindow(this);
                     if (w != null) w.Activate();
                 };
+
+                // Asegurar que si el usuario hace clic en el Panel (el juego), se active el foco en Godot
+                GamePanel.Enter += (s, args) => vm.FocusGame();
+                GamePanel.MouseClick += (s, args) => vm.FocusGame();
             }
 
             // Iniciar Overlay

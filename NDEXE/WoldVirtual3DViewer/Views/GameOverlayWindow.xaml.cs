@@ -60,5 +60,12 @@ namespace WoldVirtual3DViewer.Views
             if (parentWindow == null) return;
             // Sincroniza tamaño y posición con el padre si es necesario
         }
+
+        private void OnBackgroundClick(object sender, MouseButtonEventArgs e)
+        {
+            // Si el usuario hace clic en el fondo transparente (no en un control),
+            // devolvemos el foco al juego inmediatamente.
+            ReturnFocusToGame();
+        }
     }
 }

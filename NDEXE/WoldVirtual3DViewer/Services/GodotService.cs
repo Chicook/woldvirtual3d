@@ -222,14 +222,6 @@ namespace WoldVirtual3DViewer.Services
                 // SetFocus suele ser suficiente si el padre tiene foco.
             }
         }
-
-        // Mantener compatibilidad (Obsoleto)
-        [Obsolete("Use LaunchGodotForEmbeddingAsync instead")]
-        public async Task<bool> LaunchGodotSceneAsync(UserAccount userAccount)
-        {
-            var p = await LaunchGodotForEmbeddingAsync(userAccount);
-            return p != null && !p.HasExited;
-        }
         
         // ... (Resto de métodos: IsGodotAvailable, IsProjectValid, GetGodotVersion) ...
 
