@@ -64,3 +64,5 @@ d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\refint\Wol
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\WoldVirtual3DViewer.pdb
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\WoldVirtual3DViewer.genruntimeconfig.cache
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\ref\WoldVirtual3DViewer.dll
+d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\Views\GameView.baml
+d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Release\net8.0-windows\Views\GameView.g.cs

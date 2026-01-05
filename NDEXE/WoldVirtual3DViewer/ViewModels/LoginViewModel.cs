@@ -66,8 +66,10 @@ namespace WoldVirtual3DViewer.ViewModels
                 if (success && account != null)
                 {
                     IsLoggedIn = true;
-                    LoginStatus = "Conectado. Iniciando Godot...";
-                    await LaunchGodotAsync(account);
+                    LoginStatus = "Conectado. Cargando vista de juego...";
+                    
+                    // En lugar de lanzar Godot aquí, navegamos a la vista del juego
+                    _navigationService.NavigateTo<GameViewModel>();
                 }
                 else
                 {

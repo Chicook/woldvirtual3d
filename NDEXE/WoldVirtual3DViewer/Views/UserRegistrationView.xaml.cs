@@ -3,7 +3,7 @@ using WoldVirtual3DViewer.ViewModels;
 
 namespace WoldVirtual3DViewer.Views
 {
-    public partial class UserRegistrationView : UserControl
+    public partial class UserRegistrationView : System.Windows.Controls.UserControl
     {
         public UserRegistrationView()
         {

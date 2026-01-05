@@ -7,7 +7,7 @@ using WoldVirtual3DViewer.Views;
 
 namespace WoldVirtual3DViewer
 {
-    public partial class App : Application
+    public partial class App : System.Windows.Application
     {
         public IServiceProvider Services { get; }
 
@@ -37,6 +37,7 @@ namespace WoldVirtual3DViewer
             services.AddTransient<AvatarSelectionViewModel>();
             services.AddTransient<UserRegistrationViewModel>();
             services.AddTransient<LoginViewModel>();
+            services.AddTransient<GameViewModel>(); // Registro del nuevo VM
 
             // Views
             services.AddTransient<MainWindow>();
