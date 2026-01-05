@@ -322,7 +322,7 @@ func send_network_update():
 	
 	emit_signal("on_avatar_update", current_pos, current_rot)
 
-func receive_network_update(avatar_id: int, timestamp: float, new_position: Vector3, new_rotation: Quaternion):
+func receive_network_update(avatar_id: int, timestamp: float, position: Vector3, rotation: Quaternion):
 	# Recibir update de red para avatar remoto
 	# Optimizado para usar Quaternion en lugar de Vector3 para rotaciones
 	if not networked_avatars.has(avatar_id):
@@ -331,7 +331,7 @@ func receive_network_update(avatar_id: int, timestamp: float, new_position: Vect
 		networked_avatars[avatar_id] = new_avatar
 	
 	# Añadir snapshot al jitter buffer (orden cronológico mantenido)
-	networked_avatars[avatar_id].add_snapshot(timestamp, new_position, new_rotation)
+	networked_avatars[avatar_id].add_snapshot(timestamp, position, rotation)
 
 func process_networked_avatars(delta: float):
 	# Procesar interpolación para todos los avatares en red
@@ -425,12 +425,12 @@ func apply_compact_transform(data: PackedByteArray, offset: int = 0):
 
 # Método auxiliar para aplicar transformación de avatar en red
 # (debe ser implementado por el sistema de gestión de avatares)
-func apply_networked_avatar_transform(_avatar_id: int, _position: Vector3, _rotation: Quaternion):
+func apply_networked_avatar_transform(avatar_id: int, position: Vector3, rotation: Quaternion):
 	# Esta función debe ser implementada por el sistema de gestión de avatares
 	# para actualizar el nodo 3D correspondiente con la posición y rotación interpoladas
 	# Ejemplo:
-	# var avatar_node = get_node_or_null("Avatars/" + str(_avatar_id))
+	# var avatar_node = get_node_or_null("Avatars/" + str(avatar_id))
 	# if avatar_node:
-	#     avatar_node.global_position = _position
-	#     avatar_node.global_rotation = _rotation.get_euler()
+	#     avatar_node.global_position = position
+	#     avatar_node.global_rotation = rotation.get_euler()
 	pass

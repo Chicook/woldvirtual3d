@@ -17,11 +17,7 @@ config/features=PackedStringArray("4.5", "Forward Plus")
 [autoload]
 
 IslandManager="*res://GDSCRIP/IslandManager.gd"
-UserDatabase="*res://ND3DEXE/C#/UserDatabase.cs"
-LoginManager="*res://ND3DEXE/C#/LoginManager.cs"
-P2PNetwork="*res://ND3DEXE/C#/P2PNetwork.cs"
-Viewer3D="*res://ND3DEXE/C#/Viewer3D.cs"
 
 [editor_plugins]
 
-enabled=PackedStringArray()
+enabled=PackedStringArray("res://addons/terrain_3d/plugin.cfg")

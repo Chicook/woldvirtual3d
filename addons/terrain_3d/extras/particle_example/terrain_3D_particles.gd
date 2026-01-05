@@ -213,7 +213,8 @@ func _position_grid(pos: Vector3) -> void:
 		var node: GPUParticles3D = particle_nodes[i]
 		var snap = Vector3(pos.x, 0, pos.z).snapped(Vector3.ONE) + offsets[i]
 		node.global_position = (snap / instance_spacing).round() * instance_spacing
-		# Physics interpolation handled automatically in Godot 4.x - no restart() needed
+		# reset_physics_interpolation() is deprecated in Godot 4.x - physics interpolation is handled automatically
+		node.restart(true) # keep the same seed.
 
 
 func _update_process_parameters() -> void:
