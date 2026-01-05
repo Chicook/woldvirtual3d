@@ -62,3 +62,5 @@ D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\WoldVirtual3
 D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\WoldVirt.05C26723.Up2Date
 D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\WoldVirtual3DViewer.genruntimeconfig.cache
 D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\ref\WoldVirtual3DViewer.dll
+d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Views\LoadingView.baml
+d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Views\LoadingView.g.cs

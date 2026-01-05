@@ -1,13 +1,21 @@
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using WoldVirtual3DViewer.Models;
 
 namespace WoldVirtual3DViewer.ViewModels
 {
-    public class AvatarSelectionViewModel(MainViewModel mainViewModel) : INotifyPropertyChanged
+    public class AvatarSelectionViewModel : ViewModelBase
     {
-        private readonly MainViewModel _mainViewModel = mainViewModel;
+        private readonly MainViewModel _mainViewModel;
+
+        public AvatarSelectionViewModel(MainViewModel mainViewModel)
+        {
+            _mainViewModel = mainViewModel;
+            _mainViewModel.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(MainViewModel.AvailableAvatars)) OnPropertyChanged(nameof(Avatars));
+                else if (e.PropertyName == nameof(MainViewModel.SelectedAvatar)) OnPropertyChanged(nameof(SelectedAvatar));
+            };
+        }
 
         // Propiedades delegadas
         public ObservableCollection<AvatarInfo> Avatars => _mainViewModel.AvailableAvatars;
@@ -20,12 +28,5 @@ namespace WoldVirtual3DViewer.ViewModels
 
         // Comando delegado
         public System.Windows.Input.ICommand SelectAvatarCommand => _mainViewModel.SelectAvatarCommand;
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

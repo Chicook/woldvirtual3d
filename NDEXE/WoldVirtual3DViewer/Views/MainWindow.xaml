@@ -30,6 +30,10 @@
         <DataTemplate DataType="{x:Type vm:LoginViewModel}">
             <local:LoginView/>
         </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:LoadingViewModel}">
+            <local:LoadingView/>
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>

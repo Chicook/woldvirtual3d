@@ -1,13 +1,22 @@
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using WoldVirtual3DViewer.Models;
 
 namespace WoldVirtual3DViewer.ViewModels
 {
-    public class PCRegistrationViewModel(MainViewModel mainViewModel) : INotifyPropertyChanged
+    public class PCRegistrationViewModel : ViewModelBase
     {
-        private readonly MainViewModel _mainViewModel = mainViewModel;
+        private readonly MainViewModel _mainViewModel;
+
+        public PCRegistrationViewModel(MainViewModel mainViewModel)
+        {
+            _mainViewModel = mainViewModel;
+            _mainViewModel.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(MainViewModel.PCRegistrationStatus)) OnPropertyChanged(nameof(RegistrationStatus));
+                else if (e.PropertyName == nameof(MainViewModel.PCInfo)) OnPropertyChanged(nameof(PCInfo));
+                else if (e.PropertyName == nameof(MainViewModel.IsPCRegistered)) OnPropertyChanged(nameof(IsRegistered));
+            };
+        }
 
         // Propiedades delegadas al MainViewModel
         public string RegistrationStatus => _mainViewModel.PCRegistrationStatus;
@@ -17,20 +26,5 @@ namespace WoldVirtual3DViewer.ViewModels
         // Comandos delegados
         public ICommand RegisterPCCommand => _mainViewModel.RegisterPCCommand;
         public ICommand DownloadHashCommand => _mainViewModel.DownloadPCHashCommand;
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        // Notificar cambios cuando cambie el estado en MainViewModel
-        public void NotifyStateChanged()
-        {
-            OnPropertyChanged(nameof(PCInfo));
-            OnPropertyChanged(nameof(RegistrationStatus));
-            OnPropertyChanged(nameof(IsRegistered));
-        }
     }
 }

@@ -1,9 +1,8 @@
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 namespace WoldVirtual3DViewer.ViewModels
 {
-    public class LoginViewModel : INotifyPropertyChanged
+    public class LoginViewModel : ViewModelBase
     {
         private readonly MainViewModel _mainViewModel;
 
@@ -44,21 +43,5 @@ namespace WoldVirtual3DViewer.ViewModels
 
         // Comandos delegados
         public System.Windows.Input.ICommand LoginCommand => _mainViewModel.LoginCommand;
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        // Notificar cambios cuando cambie el estado en MainViewModel
-        public void NotifyStateChanged()
-        {
-            OnPropertyChanged(nameof(LoginUsername));
-            OnPropertyChanged(nameof(LoginPassword));
-            OnPropertyChanged(nameof(LoginStatus));
-            OnPropertyChanged(nameof(IsLoggedIn));
-        }
     }
 }

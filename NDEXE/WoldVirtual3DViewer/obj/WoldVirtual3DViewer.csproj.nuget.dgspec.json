@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\woldvirtual3d\\NDEXE\\WoldVirtual3DViewer\\WoldVirtual3DViewer.csproj": {}
+    "d:\\woldvirtual3d\\NDEXE\\WoldVirtual3DViewer\\WoldVirtual3DViewer.csproj": {}
   },
   "projects": {
-    "D:\\woldvirtual3d\\NDEXE\\WoldVirtual3DViewer\\WoldVirtual3DViewer.csproj": {
+    "d:\\woldvirtual3d\\NDEXE\\WoldVirtual3DViewer\\WoldVirtual3DViewer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\woldvirtual3d\\NDEXE\\WoldVirtual3DViewer\\WoldVirtual3DViewer.csproj",
+        "projectUniqueName": "d:\\woldvirtual3d\\NDEXE\\WoldVirtual3DViewer\\WoldVirtual3DViewer.csproj",
         "projectName": "WoldVirtual3DViewer",
-        "projectPath": "D:\\woldvirtual3d\\NDEXE\\WoldVirtual3DViewer\\WoldVirtual3DViewer.csproj",
+        "projectPath": "d:\\woldvirtual3d\\NDEXE\\WoldVirtual3DViewer\\WoldVirtual3DViewer.csproj",
         "packagesPath": "C:\\Users\\Usuario\\.nuget\\packages\\",
-        "outputPath": "D:\\woldvirtual3d\\NDEXE\\WoldVirtual3DViewer\\obj\\",
+        "outputPath": "d:\\woldvirtual3d\\NDEXE\\WoldVirtual3DViewer\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

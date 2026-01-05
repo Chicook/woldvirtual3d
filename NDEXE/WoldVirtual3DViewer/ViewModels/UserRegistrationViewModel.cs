@@ -1,13 +1,25 @@
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using WoldVirtual3DViewer.Models;
 
 namespace WoldVirtual3DViewer.ViewModels
 {
-    public class UserRegistrationViewModel(MainViewModel mainViewModel) : INotifyPropertyChanged
+    public class UserRegistrationViewModel : ViewModelBase
     {
-        private readonly MainViewModel _mainViewModel = mainViewModel;
+        private readonly MainViewModel _mainViewModel;
+
+        public UserRegistrationViewModel(MainViewModel mainViewModel)
+        {
+            _mainViewModel = mainViewModel;
+            _mainViewModel.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(MainViewModel.Username)) OnPropertyChanged(nameof(Username));
+                else if (e.PropertyName == nameof(MainViewModel.Password)) OnPropertyChanged(nameof(Password));
+                else if (e.PropertyName == nameof(MainViewModel.ConfirmPassword)) OnPropertyChanged(nameof(ConfirmPassword));
+                else if (e.PropertyName == nameof(MainViewModel.SelectedAvatar)) OnPropertyChanged(nameof(SelectedAvatar));
+                else if (e.PropertyName == nameof(MainViewModel.UserRegistrationStatus)) OnPropertyChanged(nameof(UserRegistrationStatus));
+                else if (e.PropertyName == nameof(MainViewModel.IsUserRegistered)) OnPropertyChanged(nameof(IsUserRegistered));
+            };
+        }
 
         // Propiedades delegadas al MainViewModel
         public string Username
@@ -35,23 +47,5 @@ namespace WoldVirtual3DViewer.ViewModels
         // Comandos delegados
         public ICommand RegisterUserCommand => _mainViewModel.RegisterUserCommand;
         public ICommand DownloadUserHashCommand => _mainViewModel.DownloadUserHashCommand;
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        // Notificar cambios cuando cambie el estado en MainViewModel
-        public void NotifyStateChanged()
-        {
-            OnPropertyChanged(nameof(Username));
-            OnPropertyChanged(nameof(Password));
-            OnPropertyChanged(nameof(ConfirmPassword));
-            OnPropertyChanged(nameof(SelectedAvatar));
-            OnPropertyChanged(nameof(UserRegistrationStatus));
-            OnPropertyChanged(nameof(IsUserRegistered));
-        }
     }
 }
