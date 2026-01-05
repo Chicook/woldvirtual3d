@@ -52,27 +52,62 @@ namespace WoldVirtual3DViewer.ViewModels
 
         public MainViewModel()
         {
-            _hardwareService = new HardwareService();
-            _dataService = new DataService();
-            _godotService = new GodotService();
+            try
+            {
+                // Inicialización mínima para debugging
+                AvailableAvatars = new ObservableCollection<AvatarInfo>();
+                CurrentView = new PCRegistrationViewModel(this);
 
-            // Inicializar comandos
-            RegisterPCCommand = new RelayCommand(async () => await RegisterPCAsync());
-            DownloadPCHashCommand = new RelayCommand(DownloadPCHash);
-            SelectAvatarCommand = new RelayCommand<AvatarInfo>(SelectAvatar);
-            RegisterUserCommand = new RelayCommand(async () => await RegisterUserAsync());
-            DownloadUserHashCommand = new RelayCommand(DownloadUserHash);
-            LoginCommand = new RelayCommand(async () => await LoginAsync());
-            LogoutCommand = new RelayCommand(Logout);
+                // Mostrar mensaje de que la aplicación se inició correctamente
+                System.Windows.MessageBox.Show("WoldVirtual3D Viewer se inició correctamente!\n\nPresiona OK para continuar con la configuración completa.",
+                    "Debug: Aplicación Iniciada", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
 
-            // Inicializar colección de avatares
-            AvailableAvatars = new ObservableCollection<AvatarInfo>(AvatarInfo.GetAvailableAvatars());
+                // Ahora inicializar completamente
+                InitializeFullApplication();
+            }
+            catch (Exception ex)
+            {
+                // Mostrar error en un MessageBox para debugging
+                System.Windows.MessageBox.Show($"Error crítico al inicializar: {ex.Message}\n\nStackTrace: {ex.StackTrace}",
+                    "Error Crítico", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                throw;
+            }
+        }
 
-            // Verificar estado inicial
-            CheckInitialState();
+        private void InitializeFullApplication()
+        {
+            try
+            {
+                _hardwareService = new HardwareService();
+                _dataService = new DataService();
+                _godotService = new GodotService();
 
-            // Seleccionar avatar por defecto
-            SelectedAvatar = AvailableAvatars[0]; // "chica"
+                // Inicializar comandos
+                RegisterPCCommand = new RelayCommand(async () => await RegisterPCAsync());
+                DownloadPCHashCommand = new RelayCommand(DownloadPCHash);
+                SelectAvatarCommand = new RelayCommand<AvatarInfo>(SelectAvatar);
+                RegisterUserCommand = new RelayCommand(async () => await RegisterUserAsync());
+                DownloadUserHashCommand = new RelayCommand(DownloadUserHash);
+                LoginCommand = new RelayCommand(async () => await LoginAsync());
+                LogoutCommand = new RelayCommand(Logout);
+
+                // Inicializar colección de avatares completa
+                AvailableAvatars = new ObservableCollection<AvatarInfo>(AvatarInfo.GetAvailableAvatars());
+
+                // Seleccionar avatar por defecto (verificar que hay avatares disponibles)
+                if (AvailableAvatars.Count > 0)
+                {
+                    SelectedAvatar = AvailableAvatars[0]; // "chica"
+                }
+
+                // Verificar estado inicial
+                CheckInitialState();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Error en inicialización completa: {ex.Message}",
+                    "Error de Configuración", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+            }
         }
 
         #region Propiedades
@@ -237,15 +272,24 @@ namespace WoldVirtual3DViewer.ViewModels
                     PCInfo = savedPCInfo;
                     IsPCRegistered = true;
 
-                    // Verificar si coincide con el PC actual
-                    var currentPCInfo = _hardwareService.GetPCInfo();
-                    if (savedPCInfo.UniqueHash != null && _hardwareService.ValidatePCHash(savedPCInfo.UniqueHash, currentPCInfo))
+                    try
                     {
-                        PCRegistrationStatus = "PC registrado y validado";
+                        // Verificar si coincide con el PC actual
+                        var currentPCInfo = _hardwareService.GetPCInfo();
+                        if (savedPCInfo.UniqueHash != null && _hardwareService.ValidatePCHash(savedPCInfo.UniqueHash, currentPCInfo))
+                        {
+                            PCRegistrationStatus = "PC registrado y validado";
+                        }
+                        else
+                        {
+                            PCRegistrationStatus = "El hash del PC no coincide. Registre este PC nuevamente.";
+                            IsPCRegistered = false;
+                        }
                     }
-                    else
+                    catch
                     {
-                        PCRegistrationStatus = "El hash del PC no coincide. Registre este PC nuevamente.";
+                        // Si hay error al verificar hardware, asumir que no está registrado
+                        PCRegistrationStatus = "Error al verificar PC. Registre nuevamente.";
                         IsPCRegistered = false;
                     }
                 }
@@ -283,7 +327,9 @@ namespace WoldVirtual3DViewer.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al verificar estado inicial: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                // En caso de error, mostrar vista de registro de PC
+                PCRegistrationStatus = $"Error: {ex.Message}";
+                CurrentView = new PCRegistrationViewModel(this);
             }
         }
 
