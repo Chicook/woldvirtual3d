@@ -32,8 +32,11 @@ namespace WoldVirtual3D.Viewer
         /// </summary>
         public async Task<bool> LoginAsync(string username, string password)
         {
+            System.Diagnostics.Debug.WriteLine($"[LoginManager] LoginAsync llamado para usuario: {username}");
+            
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
+                System.Diagnostics.Debug.WriteLine($"[LoginManager] Usuario o contraseña vacíos");
                 OnLoginFailed?.Invoke("Usuario y contrasena requeridos");
                 return false;
             }
@@ -42,14 +45,17 @@ namespace WoldVirtual3D.Viewer
             {
                 if (_userDatabase == null)
                 {
+                    System.Diagnostics.Debug.WriteLine($"[LoginManager] Base de datos no inicializada");
                     OnLoginFailed?.Invoke("Base de datos no inicializada");
                     return false;
                 }
 
+                System.Diagnostics.Debug.WriteLine($"[LoginManager] Llamando a AuthenticateUserAsync...");
                 var user = await _userDatabase.AuthenticateUserAsync(username, password);
                 
                 if (user != null)
                 {
+                    System.Diagnostics.Debug.WriteLine($"[LoginManager] Autenticación exitosa para: {username}");
                     _isAuthenticated = true;
                     _currentUserId = user.Id;
                     _currentUsername = user.Username;
@@ -61,12 +67,15 @@ namespace WoldVirtual3D.Viewer
                 }
                 else
                 {
+                    System.Diagnostics.Debug.WriteLine($"[LoginManager] Autenticación fallida - credenciales inválidas");
                     OnLoginFailed?.Invoke("Credenciales invalidas");
                     return false;
                 }
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"[LoginManager] Excepción durante login: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[LoginManager] StackTrace: {ex.StackTrace}");
                 OnLoginFailed?.Invoke($"Error del sistema: {ex.Message}");
                 return false;
             }

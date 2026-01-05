@@ -116,9 +116,25 @@ namespace WoldVirtual3D.Viewer
                     {
                         conn.Open();
                         
+                        // Verificar si el usuario ya existe
+                        var checkCmd = @"SELECT id FROM users WHERE username = @username";
+                        using (var check = new SQLiteCommand(checkCmd, conn))
+                        {
+                            check.Parameters.AddWithValue("@username", username);
+                            var existingId = check.ExecuteScalar();
+                            if (existingId != null)
+                            {
+                                System.Diagnostics.Debug.WriteLine($"[UserDatabase] Usuario ya existe: {username}");
+                                return "";
+                            }
+                        }
+                        
                         var userId = Guid.NewGuid().ToString();
                         var passwordHash = HashPassword(password);
                         var createdAt = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+
+                        System.Diagnostics.Debug.WriteLine($"[UserDatabase] Creando usuario: {username}");
+                        System.Diagnostics.Debug.WriteLine($"[UserDatabase] Password hash: {passwordHash}");
 
                         var insertCmd = @"
                             INSERT INTO users (id, username, password_hash, email, created_at, is_active)
@@ -145,16 +161,19 @@ namespace WoldVirtual3D.Viewer
                             cmd.ExecuteNonQuery();
                         }
 
+                        System.Diagnostics.Debug.WriteLine($"[UserDatabase] Usuario creado exitosamente: {username}, ID: {userId}");
                         return userId;
                     }
                 }
                 catch (SQLiteException ex) when (ex.Message.Contains("UNIQUE"))
                 {
+                    System.Diagnostics.Debug.WriteLine($"[UserDatabase] Error UNIQUE al crear usuario: {ex.Message}");
                     return "";
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"UserDatabase: Error al crear usuario: {ex.Message}");
+                    System.Diagnostics.Debug.WriteLine($"[UserDatabase] Error al crear usuario: {ex.Message}");
+                    System.Diagnostics.Debug.WriteLine($"[UserDatabase] StackTrace: {ex.StackTrace}");
                     return "";
                 }
             });
