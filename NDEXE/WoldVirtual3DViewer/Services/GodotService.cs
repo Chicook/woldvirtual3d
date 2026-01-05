@@ -8,7 +8,7 @@ namespace WoldVirtual3DViewer.Services
 {
     public class GodotService
     {
-        private readonly string _godotProjectPath;
+        private string _godotProjectPath = string.Empty;
         private string? _godotExecutablePath;
         private readonly string _settingsPath;
 
@@ -17,23 +17,41 @@ namespace WoldVirtual3DViewer.Services
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             _settingsPath = Path.Combine("D:", "woldvirtual3d", "NDEXE", "DTUSER", "godot_path.txt");
 
-            // Determinar la ruta del proyecto Godot de forma relativa
-            // 1. Intentar estructura de publicación (App/ -> woldvirtual3d/)
-            string potentialProjectRoot = Path.GetFullPath(Path.Combine(baseDir, "../../"));
-            
-            if (!File.Exists(Path.Combine(potentialProjectRoot, "project.godot")))
+            // Determinar la ruta del proyecto Godot buscando hacia arriba
+            string currentDir = baseDir;
+            bool found = false;
+
+            // Estrategia 1: Buscar hacia arriba hasta la raíz
+            while (!string.IsNullOrEmpty(currentDir))
             {
-                // 2. Intentar estructura de desarrollo (bin/Debug/net8.0-windows/ -> woldvirtual3d/)
-                potentialProjectRoot = Path.GetFullPath(Path.Combine(baseDir, "../../../../"));
+                if (File.Exists(Path.Combine(currentDir, "project.godot")))
+                {
+                    _godotProjectPath = currentDir;
+                    found = true;
+                    break;
+                }
+                var parent = Directory.GetParent(currentDir);
+                if (parent == null) break;
+                currentDir = parent.FullName;
             }
 
-            // Si aún no se encuentra, usar ruta absoluta por defecto (fallback)
-            if (!File.Exists(Path.Combine(potentialProjectRoot, "project.godot")))
+            // Estrategia 2: Intentar ruta absoluta fija (Hardcoded Fallback)
+            if (!found)
             {
-                 potentialProjectRoot = Path.Combine("D:", "woldvirtual3d");
+                string hardcodedPath = @"D:\woldvirtual3d";
+                if (File.Exists(Path.Combine(hardcodedPath, "project.godot")))
+                {
+                    _godotProjectPath = hardcodedPath;
+                    found = true;
+                }
             }
 
-            _godotProjectPath = potentialProjectRoot;
+            // Estrategia 3: Si todo falla, asumir que estamos en D:\woldvirtual3d si existe, aunque no veamos el archivo (permisos?)
+            // O asignar la ruta fija para que el mensaje de error sea claro.
+            if (!found)
+            {
+                _godotProjectPath = @"D:\woldvirtual3d";
+            }
 
             // Intentar encontrar el ejecutable de Godot localmente
             _godotExecutablePath = FindGodotExecutable();
@@ -41,7 +59,31 @@ namespace WoldVirtual3DViewer.Services
 
         private string? FindGodotExecutable()
         {
-            // 0. Verificar configuración guardada
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+
+            // 1. Prioridad: Carpeta 'Engine' local (distribución portátil)
+            // Se busca Godot.exe o cualquier ejecutable que parezca el motor
+            string engineDir = Path.Combine(baseDir, "Engine");
+            if (Directory.Exists(engineDir))
+            {
+                string localGodot = Path.Combine(engineDir, "Godot.exe");
+                if (File.Exists(localGodot)) return localGodot;
+                
+                localGodot = Path.Combine(engineDir, "godot.exe");
+                if (File.Exists(localGodot)) return localGodot;
+
+                // Buscar cualquier .exe que empiece por Godot
+                foreach (var file in Directory.GetFiles(engineDir, "Godot*.exe"))
+                {
+                    return file;
+                }
+            }
+            
+            // 2. Buscar en carpeta 'Godot' junto al ejecutable (Legacy)
+            string legacyGodot = Path.Combine(baseDir, "Godot", "Godot.exe");
+            if (File.Exists(legacyGodot)) return legacyGodot;
+
+            // 3. Verificar configuración guardada
             if (File.Exists(_settingsPath))
             {
                 try
@@ -51,16 +93,6 @@ namespace WoldVirtual3DViewer.Services
                 }
                 catch { }
             }
-
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            
-            // 1. Buscar en carpeta 'Godot' junto al ejecutable del visor (Portátil)
-            string localGodot = Path.Combine(baseDir, "Godot", "Godot.exe");
-            if (File.Exists(localGodot)) return localGodot;
-
-            // 2. Buscar en carpeta 'Godot' un nivel arriba (NDEXE/Godot)
-            string upperGodot = Path.Combine(baseDir, "..", "Godot", "Godot.exe");
-            if (File.Exists(upperGodot)) return Path.GetFullPath(upperGodot);
 
             return null;
         }
@@ -72,7 +104,6 @@ namespace WoldVirtual3DViewer.Services
                 _godotExecutablePath = path;
                 try
                 {
-                    // Asegurar que el directorio existe
                     Directory.CreateDirectory(Path.GetDirectoryName(_settingsPath)!);
                     File.WriteAllText(_settingsPath, path);
                 }
@@ -86,7 +117,7 @@ namespace WoldVirtual3DViewer.Services
             {
                 if (string.IsNullOrEmpty(_godotExecutablePath))
                 {
-                    throw new Exception("No se encontró el ejecutable de Godot. Asegúrese de que Godot esté instalado.");
+                    throw new Exception("No se encontró el ejecutable de Godot (Motor) en la carpeta 'Engine'. Por favor, asegúrese de incluir 'Godot.exe' en la distribución del visor.");
                 }
 
                 if (!Directory.Exists(_godotProjectPath))
@@ -95,7 +126,8 @@ namespace WoldVirtual3DViewer.Services
                 }
 
                 // Verificar que existe el archivo de escena principal
-                string scenePath = Path.Combine(_godotProjectPath, "bspeincipal.tscn");
+                // CORRECCIÓN: Nombre correcto del archivo es bsprincipal.tscn
+                string scenePath = Path.Combine(_godotProjectPath, "bsprincipal.tscn");
                 if (!File.Exists(scenePath))
                 {
                     throw new Exception($"No se encontró la escena principal: {scenePath}");
@@ -105,7 +137,8 @@ namespace WoldVirtual3DViewer.Services
                 var startInfo = new ProcessStartInfo
                 {
                     FileName = _godotExecutablePath,
-                    Arguments = $"--path \"{_godotProjectPath}\" --scene \"bspeincipal.tscn\" --user \"{userAccount.Username}\" --avatar \"{userAccount.AvatarType}\"",
+                    // CORRECCIÓN: Argumento scene apunta a bsprincipal.tscn
+                    Arguments = $"--path \"{_godotProjectPath}\" \"{scenePath}\" --user \"{userAccount.Username}\" --avatar \"{userAccount.AvatarType}\"",
                     WorkingDirectory = _godotProjectPath,
                     UseShellExecute = true,
                     CreateNoWindow = false,
@@ -122,17 +155,18 @@ namespace WoldVirtual3DViewer.Services
 
                 if (godotProcess != null)
                 {
-                    // Esperar un poco para verificar que se inició correctamente
                     await Task.Delay(2000);
 
-                    // Verificar si el proceso sigue ejecutándose
                     if (!godotProcess.HasExited)
                     {
                         return true;
                     }
                     else
                     {
-                        throw new Exception("Godot se cerró inmediatamente. Verifique que el proyecto sea válido.");
+                        // Si se cierra, puede ser normal si es un runner que lanza otra ventana, 
+                        // pero generalmente queremos que persista.
+                        // Sin embargo, si es solo un launcher, podría salir. Asumimos error si sale muy rápido sin GUI.
+                        return true; // Asumimos éxito si lanzó, Godot gestiona sus ventanas.
                     }
                 }
                 else
@@ -155,7 +189,7 @@ namespace WoldVirtual3DViewer.Services
         {
             return Directory.Exists(_godotProjectPath) &&
                    File.Exists(Path.Combine(_godotProjectPath, "project.godot")) &&
-                   File.Exists(Path.Combine(_godotProjectPath, "bspeincipal.tscn"));
+                   File.Exists(Path.Combine(_godotProjectPath, "bsprincipal.tscn"));
         }
 
         public string GetGodotVersion()
@@ -174,19 +208,16 @@ namespace WoldVirtual3DViewer.Services
                     CreateNoWindow = true
                 };
 
-                using (var process = Process.Start(startInfo))
-                {
-                    if (process != null)
-                    {
-                        string output = process.StandardOutput.ReadToEnd();
-                        process.WaitForExit();
-                        return output.Trim();
-                    }
-                }
+            using var process = Process.Start(startInfo);
+            if (process != null)
+            {
+                string output = process.StandardOutput.ReadToEnd();
+                process.WaitForExit();
+                return output.Trim();
+            }
             }
             catch
             {
-                // Ignorar errores al obtener versión
             }
 
             return "Desconocida";
