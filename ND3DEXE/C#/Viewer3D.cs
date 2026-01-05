@@ -3,33 +3,34 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Threading.Tasks;
+using WoldVirtual3D.Viewer.Server;
 
 namespace WoldVirtual3D.Viewer
 {
     /// <summary>
     /// Visor 3D principal (version Windows Forms)
-    /// Responsabilidad: Gestionar el renderizado 3D usando OpenTK y cargar escenas de Godot
+    /// Responsabilidad: Gestionar el renderizado 3D embebiendo Godot dentro del Panel
     /// </summary>
     public class Viewer3D : IDisposable
     {
         private Panel? _renderPanel;
         private bool _disposed = false;
         private Label? _statusLabel;
-        private Process? _godotProcess;
+        private InternalServer? _internalServer;
 
         public void Initialize(Panel renderPanel)
         {
             _renderPanel = renderPanel;
             _renderPanel.BackColor = System.Drawing.Color.Black;
             
-            // Mostrar mensaje de carga inicial
             ShowLoadingMessage("Inicializando visor 3D...");
         }
 
         /// <summary>
-        /// Carga una escena de Godot (bsprincipal.tscn)
+        /// Carga una escena de Godot (bsprincipal.tscn) embebida en el Panel
         /// </summary>
-        public void LoadGodotScene(string scenePath = "res://bsprincipal.tscn")
+        public async void LoadGodotScene(string scenePath = "res://bsprincipal.tscn")
         {
             if (_renderPanel == null || _disposed) return;
 
@@ -37,41 +38,30 @@ namespace WoldVirtual3D.Viewer
             {
                 ShowLoadingMessage("Cargando escena 3D...");
 
-                // Buscar ejecutable de Godot
-                var godotPath = FindGodotExecutable();
-                if (godotPath != null && File.Exists(godotPath))
+                _internalServer = new InternalServer();
+                _internalServer.SetParentControl(_renderPanel);
+                
+                _internalServer.OnGodotQuit += (s, e) =>
                 {
-                    // Obtener el directorio del proyecto Godot (dos niveles arriba desde ND3DEXE/C#)
-                    var projectRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", ".."));
-                    
-                    // Iniciar Godot con la escena
-                    var startInfo = new ProcessStartInfo
+                    if (_renderPanel != null && !_disposed)
                     {
-                        FileName = godotPath,
-                        Arguments = $"--path \"{projectRoot}\" --scene \"{scenePath}\"",
-                        UseShellExecute = false,
-                        CreateNoWindow = false
-                    };
-
-                    _godotProcess = Process.Start(startInfo);
-                    if (_godotProcess != null)
-                    {
-                        _godotProcess.Exited += (s, e) =>
+                        _renderPanel.Invoke((MethodInvoker)delegate
                         {
-                            if (_renderPanel != null && !_disposed)
-                            {
-                                _renderPanel.Invoke((MethodInvoker)delegate
-                                {
-                                    ShowLoadingMessage("Escena cerrada. Presiona cualquier tecla para continuar...");
-                                });
-                            }
-                        };
+                            ShowLoadingMessage("Escena cerrada.");
+                        });
                     }
-                }
-                else
+                };
+
+                bool success = await _internalServer.InitializeAsync();
+                
+                if (!success)
                 {
-                    // Si no se encuentra Godot, mostrar mensaje informativo
-                    ShowLoadingMessage("Godot no encontrado. La escena se cargaría aquí.\n\nRuta de escena: " + scenePath);
+                    string error = _internalServer.GetLastError();
+                    var exeDir = AppDomain.CurrentDomain.BaseDirectory;
+                    var godotLocalPath = Path.Combine(exeDir, "Godot", "Godot.exe");
+                    var msg = $"Error al cargar escena:\n{error}\n\n" +
+                              $"Asegúrate de colocar Godot.exe en:\n{godotLocalPath}";
+                    ShowLoadingMessage(msg);
                 }
             }
             catch (Exception ex)
@@ -83,26 +73,129 @@ namespace WoldVirtual3D.Viewer
 
         private string? FindGodotExecutable()
         {
-            var possiblePaths = new[]
+            // PRIMERO: Buscar en carpetas locales (incluido con la aplicación)
+            var localPaths = new List<string>
+            {
+                // Carpeta Godot junto al ejecutable
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Godot", "Godot.exe"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Godot", "Godot_v4.5-stable_win64.exe"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Godot", "Godot_v4.3-stable_win64.exe"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Godot", "Godot_v4.2-stable_win64.exe"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Godot", "Godot_v4.1-stable_win64.exe"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Godot", "Godot_v4.0-stable_win64.exe"),
+                
+                // En el directorio del ejecutable directamente
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Godot.exe"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Godot_v4.5-stable_win64.exe"),
+                
+                // En el directorio del proyecto (para desarrollo)
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "Godot", "Godot.exe"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "Godot", "Godot.exe"),
+            };
+
+            foreach (var path in localPaths)
+            {
+                var fullPath = Path.GetFullPath(path);
+                if (File.Exists(fullPath))
+                {
+                    System.Diagnostics.Debug.WriteLine($"[Viewer3D] Godot encontrado localmente en: {fullPath}");
+                    return fullPath;
+                }
+            }
+
+            // SEGUNDO: Buscar en ubicaciones del sistema (solo como fallback)
+            var systemPaths = new List<string>
             {
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), 
                     "Programs", "Godot", "Godot_v4.5-stable_win64.exe"),
                 @"C:\Program Files\Godot\Godot_v4.5-stable_win64.exe",
+                @"C:\Program Files (x86)\Godot\Godot_v4.5-stable_win64.exe",
                 @"C:\Godot\Godot_v4.5-stable_win64.exe",
-                // También buscar versiones sin el sufijo específico
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), 
                     "Programs", "Godot", "Godot.exe"),
                 @"C:\Program Files\Godot\Godot.exe",
+                @"C:\Program Files (x86)\Godot\Godot.exe",
+                @"C:\Godot\Godot.exe",
             };
 
-            foreach (var path in possiblePaths)
+            foreach (var path in systemPaths)
             {
                 if (File.Exists(path))
                 {
+                    System.Diagnostics.Debug.WriteLine($"[Viewer3D] Godot encontrado en sistema en: {path}");
                     return path;
                 }
             }
 
+            // Buscar usando el comando 'where' de Windows (busca en PATH)
+            try
+            {
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = "where.exe",
+                    Arguments = "godot",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true
+                };
+
+                using (var process = Process.Start(startInfo))
+                {
+                    if (process != null)
+                    {
+                        var output = process.StandardOutput.ReadToEnd();
+                        process.WaitForExit();
+                        
+                        if (process.ExitCode == 0 && !string.IsNullOrWhiteSpace(output))
+                        {
+                            var foundPath = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                                                   .FirstOrDefault(p => p.EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
+                            
+                            if (!string.IsNullOrEmpty(foundPath) && File.Exists(foundPath))
+                            {
+                                System.Diagnostics.Debug.WriteLine($"[Viewer3D] Godot encontrado en PATH: {foundPath}");
+                                return foundPath.Trim();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[Viewer3D] Error buscando Godot en PATH: {ex.Message}");
+            }
+
+            // Buscar recursivamente en directorios comunes
+            var searchDirs = new[]
+            {
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                @"C:\Program Files",
+                @"C:\Program Files (x86)",
+                @"C:\"
+            };
+
+            foreach (var searchDir in searchDirs)
+            {
+                if (Directory.Exists(searchDir))
+                {
+                    try
+                    {
+                        var godotExe = Directory.GetFiles(searchDir, "Godot*.exe", SearchOption.TopDirectoryOnly)
+                                                .FirstOrDefault();
+                        if (!string.IsNullOrEmpty(godotExe) && File.Exists(godotExe))
+                        {
+                            System.Diagnostics.Debug.WriteLine($"[Viewer3D] Godot encontrado en búsqueda: {godotExe}");
+                            return godotExe;
+                        }
+                    }
+                    catch
+                    {
+                        // Ignorar errores de acceso
+                    }
+                }
+            }
+
+            System.Diagnostics.Debug.WriteLine("[Viewer3D] Godot no encontrado en ninguna ubicación");
             return null;
         }
 
@@ -131,11 +224,7 @@ namespace WoldVirtual3D.Viewer
             {
                 try
                 {
-                    if (_godotProcess != null && !_godotProcess.HasExited)
-                    {
-                        _godotProcess.Kill();
-                        _godotProcess.Dispose();
-                    }
+                    _internalServer?.Dispose();
                 }
                 catch { }
 
