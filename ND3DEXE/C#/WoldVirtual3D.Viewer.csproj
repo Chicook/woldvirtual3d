@@ -1,0 +1,20 @@
+<Project Sdk="Godot.NET.Sdk/4.5.0">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">net7.0</TargetFramework>
+    <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'ios' ">net7.0</TargetFramework>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <RootNamespace>WoldVirtual3D.Viewer</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="LoginManager.cs" />
+    <Compile Include="UserDatabase.cs" />
+    <Compile Include="Viewer3D.cs" />
+    <Compile Include="DataModels.cs" />
+    <Compile Include="P2PNetwork.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
+  </ItemGroup>
+</Project>
+
