@@ -5,24 +5,57 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="768" d:DesignWidth="1024">
     <Grid Background="#1E1E1E">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/> <!-- Barra Superior (Monedas/Estado) -->
+            <RowDefinition Height="*"/>    <!-- Godot (3D) -->
+            <RowDefinition Height="Auto"/> <!-- Barra Inferior (Chat) -->
         </Grid.RowDefinitions>
 
-        <!-- Barra superior superpuesta o controles -->
-        <Border Grid.Row="0" Background="#333333" Padding="10">
-            <StackPanel Orientation="Horizontal">
-                <Button Content="Salir / Desconectar" Command="{Binding GoBackCommand}" Width="150" Background="#FF4444"/>
-                <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" Margin="10,0,0,0" Foreground="White"/>
+        <!-- Fila 0: Barra Superior -->
+        <Grid Grid.Row="0" Background="#333333" Height="40">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Estado -->
+            <TextBlock Grid.Column="0" Text="{Binding StatusText}" Foreground="#AAAAAA" VerticalAlignment="Center" Margin="10,0"/>
+            
+            <!-- Balance -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="0,0,10,0">
+                <TextBlock Text="{Binding WCVcoinBalance, StringFormat='{}{0:N3} WCVcoin'}" 
+                           Foreground="#00FF00" FontWeight="Bold" VerticalAlignment="Center" FontSize="14"/>
             </StackPanel>
-        </Border>
+        </Grid>
 
-        <!-- Contenedor para Godot -->
-        <WindowsFormsHost Grid.Row="1" x:Name="GodotHost">
+        <!-- Fila 1: Godot -->
+        <WindowsFormsHost Grid.Row="1" x:Name="GodotHost" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <wf:Panel x:Name="GamePanel" BackColor="Black"/>
         </WindowsFormsHost>
+
+        <!-- Fila 2: Barra de Chat -->
+        <Grid Grid.Row="2" Background="#252525" Height="50">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Input Chat -->
+            <TextBox Grid.Column="0" Text="{Binding ChatMessage}" Margin="10,10,5,10" 
+                     Background="#111111" Foreground="White" BorderThickness="1" BorderBrush="#444444"
+                     Padding="5" VerticalContentAlignment="Center" FontSize="14"/>
+
+            <!-- Botón Enviar -->
+            <Button Grid.Column="1" Content="Enviar" Command="{Binding SendChatCommand}" 
+                    Margin="5,10,5,10" Width="80" Background="#4A90E2" Foreground="White" FontWeight="Bold"/>
+
+            <!-- Botón Salir -->
+            <Button Grid.Column="2" Content="Salir" Command="{Binding GoBackCommand}" 
+                    Margin="5,10,10,10" Width="60" Background="#CC4444" Foreground="White"/>
+        </Grid>
     </Grid>
 </UserControl>

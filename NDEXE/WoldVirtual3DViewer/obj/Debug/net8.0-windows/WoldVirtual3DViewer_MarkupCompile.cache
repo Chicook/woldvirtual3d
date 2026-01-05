@@ -12,9 +12,9 @@ TRACE;DEBUG;NET;NET8_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\App.xaml
 81309143057
 
-331480306059
+35305221469
 236-1172597204
 Themes\DarkTheme.xaml;Views\AvatarSelectionView.xaml;Views\GameView.xaml;Views\LoadingView.xaml;Views\LoginView.xaml;Views\MainWindow.xaml;Views\PCRegistrationView.xaml;Views\UserRegistrationView.xaml;
 
-False
+True
 

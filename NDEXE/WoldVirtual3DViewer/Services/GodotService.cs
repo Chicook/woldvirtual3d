@@ -17,6 +17,9 @@ namespace WoldVirtual3DViewer.Services
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
 
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
         [DllImport("user32.dll")]
         private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
@@ -170,16 +173,32 @@ namespace WoldVirtual3DViewer.Services
              return process;
         }
 
+        private const int WS_CAPTION = 0x00C00000;
+        private const int WS_THICKFRAME = 0x00040000;
+        private const int WS_POPUP = -2147483648; // 0x80000000
+        private const uint SWP_FRAMECHANGED = 0x0020;
+        private const uint SWP_NOMOVE = 0x0002;
+        private const uint SWP_NOSIZE = 0x0001;
+        private const uint SWP_NOZORDER = 0x0004;
+
         public void EmbedWindow(IntPtr childHandle, IntPtr parentHandle)
         {
             if (childHandle == IntPtr.Zero || parentHandle == IntPtr.Zero) return;
 
-            // Cambiar estilo a hijo
+            // Obtener estilo actual
             int style = GetWindowLong(childHandle, GWL_STYLE);
-            SetWindowLong(childHandle, GWL_STYLE, (style | WS_CHILD)); // & ~WS_POPUP si fuera necesario, pero --borderless ayuda
+            
+            // Eliminar bordes, barra de título y convertir a child
+            style = style & ~WS_CAPTION & ~WS_THICKFRAME; // Quitar título y bordes redimensionables
+            style |= WS_CHILD; // Añadir estilo hijo
+            
+            SetWindowLong(childHandle, GWL_STYLE, style);
 
             // Establecer padre
             SetParent(childHandle, parentHandle);
+
+            // Forzar actualización del estilo (Frame Changed)
+            SetWindowPos(childHandle, IntPtr.Zero, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER);
         }
 
         public void ResizeEmbeddedWindow(IntPtr childHandle, int width, int height)

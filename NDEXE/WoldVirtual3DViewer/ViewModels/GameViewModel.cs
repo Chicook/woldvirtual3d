@@ -25,7 +25,22 @@ namespace WoldVirtual3DViewer.ViewModels
             set => SetProperty(ref _statusText, value);
         }
 
+        private decimal _wcvCoinBalance = 0.000m;
+        public decimal WCVcoinBalance
+        {
+            get => _wcvCoinBalance;
+            set => SetProperty(ref _wcvCoinBalance, value);
+        }
+
+        private string _chatMessage = string.Empty;
+        public string ChatMessage
+        {
+            get => _chatMessage;
+            set => SetProperty(ref _chatMessage, value);
+        }
+
         public ICommand GoBackCommand { get; }
+        public ICommand SendChatCommand { get; }
 
         public GameViewModel(GodotService godotService, RegistrationContext registrationContext, INavigationService navigationService)
         {
@@ -34,6 +49,16 @@ namespace WoldVirtual3DViewer.ViewModels
             _navigationService = navigationService;
 
             GoBackCommand = new RelayCommand(GoBack);
+            SendChatCommand = new RelayCommand(SendChat);
+        }
+
+        private void SendChat()
+        {
+            if (string.IsNullOrWhiteSpace(ChatMessage)) return;
+            // Aquí iría la lógica de envío real (socket, api, godot bridge)
+            // Por ahora solo limpiamos
+            StatusText = $"Chat enviado: {ChatMessage}";
+            ChatMessage = string.Empty;
         }
 
         public void InitializeGame(Control hostControl)
