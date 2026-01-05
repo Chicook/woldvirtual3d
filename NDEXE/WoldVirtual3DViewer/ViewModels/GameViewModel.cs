@@ -56,7 +56,7 @@ namespace WoldVirtual3DViewer.ViewModels
                     // Por ahora asumimos que el RegistrationContext o un UserSession tiene los datos.
                     // OJO: El RegistrationContext es para registro. Deberíamos tener un UserSessionService.
                     // Usaremos valores por defecto si faltan, o lo que haya en RegistrationContext.
-                    AvatarType = _registrationContext.SelectedAvatar?.Id ?? "chica"
+                    AvatarType = _registrationContext.SelectedAvatar?.Type ?? "chica"
                 };
 
                 _godotProcess = await _godotService.LaunchGodotForEmbeddingAsync(account);

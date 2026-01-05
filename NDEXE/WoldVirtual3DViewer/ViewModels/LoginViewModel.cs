@@ -74,14 +74,14 @@ namespace WoldVirtual3DViewer.ViewModels
                 else
                 {
                     LoginStatus = "Credenciales incorrectas.";
-                    MessageBox.Show("Usuario o contraseña incorrectos.");
+                    System.Windows.MessageBox.Show("Usuario o contraseña incorrectos.");
                 }
             }
             catch (Exception ex)
             {
                 LoginStatus = "Error";
                 Logger.LogError("Login error", ex);
-                MessageBox.Show(ex.Message);
+                System.Windows.MessageBox.Show(ex.Message);
             }
         }
 
@@ -92,7 +92,7 @@ namespace WoldVirtual3DViewer.ViewModels
                 if (!_godotService.IsGodotAvailable())
                 {
                     // Manual search logic
-                    if (MessageBox.Show("No se encuentra Godot.exe. ¿Buscar manualmente?", "Godot", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    if (System.Windows.MessageBox.Show("No se encuentra Godot.exe. ¿Buscar manualmente?", "Godot", System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.Yes)
                     {
                         var dialog = new Microsoft.Win32.OpenFileDialog { Filter = "Godot.exe|*.exe" };
                         if (dialog.ShowDialog() == true)
@@ -106,19 +106,19 @@ namespace WoldVirtual3DViewer.ViewModels
 
                 if (!_godotService.IsProjectValid())
                 {
-                    MessageBox.Show("No se encuentra el proyecto (project.godot).");
+                    System.Windows.MessageBox.Show("No se encuentra el proyecto (project.godot).");
                     return;
                 }
 
                 bool launched = await _godotService.LaunchGodotSceneAsync(account);
                 if (launched)
                 {
-                    Application.Current.Shutdown();
+                    System.Windows.Application.Current.Shutdown();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al lanzar Godot: {ex.Message}");
+                System.Windows.MessageBox.Show($"Error al lanzar Godot: {ex.Message}");
             }
         }
     }

@@ -36,11 +36,13 @@ d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\bin\Debug\net8.0-windows\runtimes\win
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\WoldVirtual3DViewer.csproj.AssemblyReference.cache
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Themes\DarkTheme.baml
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Views\AvatarSelectionView.baml
+d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Views\GameView.baml
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Views\LoadingView.baml
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Views\LoginView.baml
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Views\PCRegistrationView.baml
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Views\UserRegistrationView.baml
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Views\AvatarSelectionView.g.cs
+d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Views\GameView.g.cs
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Views\LoadingView.g.cs
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Views\LoginView.g.cs
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Views\MainWindow.g.cs

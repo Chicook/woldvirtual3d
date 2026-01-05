@@ -64,14 +64,14 @@ namespace WoldVirtual3DViewer.ViewModels
                     // Update shared context
                     _registrationContext.PCInfo = localPCInfo;
 
-                    MessageBox.Show("PC registrado. Ahora seleccione su avatar.", "Éxito");
+                    System.Windows.MessageBox.Show("PC registrado. Ahora seleccione su avatar.", "Éxito");
                     _navigationService.NavigateTo<AvatarSelectionViewModel>();
                 }
             }
             catch (Exception ex)
             {
                 RegistrationStatus = $"Error: {ex.Message}";
-                MessageBox.Show(ex.Message);
+                System.Windows.MessageBox.Show(ex.Message);
             }
         }
 
@@ -85,10 +85,10 @@ namespace WoldVirtual3DViewer.ViewModels
                 if (dialog.ShowDialog() == true)
                 {
                     System.IO.File.Copy(path, dialog.FileName, true);
-                    MessageBox.Show("Archivo guardado.");
+                    System.Windows.MessageBox.Show("Archivo guardado.");
                 }
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (Exception ex) { System.Windows.MessageBox.Show(ex.Message); }
         }
     }
 }

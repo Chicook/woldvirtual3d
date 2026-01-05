@@ -13,10 +13,10 @@ namespace WoldVirtual3DViewer.Converters
 
             return status?.ToLower() switch
             {
-                "available" => new SolidColorBrush(Color.FromRgb(72, 187, 120)), // Verde
-                "development" => new SolidColorBrush(Color.FromRgb(246, 173, 85)), // Amarillo
-                "coming_soon" => new SolidColorBrush(Color.FromRgb(160, 174, 192)), // Gris
-                _ => new SolidColorBrush(Color.FromRgb(245, 101, 101)) // Rojo por defecto
+                "available" => new SolidColorBrush(System.Windows.Media.Color.FromRgb(72, 187, 120)), // Verde
+                "development" => new SolidColorBrush(System.Windows.Media.Color.FromRgb(246, 173, 85)), // Amarillo
+                "coming_soon" => new SolidColorBrush(System.Windows.Media.Color.FromRgb(160, 174, 192)), // Gris
+                _ => new SolidColorBrush(System.Windows.Media.Color.FromRgb(245, 101, 101)) // Rojo por defecto
             };
         }
 

@@ -38,7 +38,7 @@ namespace WoldVirtual3DViewer.ViewModels
                     var userAccount = _dataService.LoadUserAccount();
                     if (userAccount != null && userAccount.IsValidated)
                     {
-                        Application.Current.Dispatcher.Invoke(() => 
+                        System.Windows.Application.Current.Dispatcher.Invoke(() => 
                             _navigationService.NavigateTo<LoginViewModel>());
                         return;
                     }
@@ -48,20 +48,20 @@ namespace WoldVirtual3DViewer.ViewModels
                     if (pcInfo != null)
                     {
                         _registrationContext.PCInfo = pcInfo;
-                        Application.Current.Dispatcher.Invoke(() => 
+                        System.Windows.Application.Current.Dispatcher.Invoke(() => 
                             _navigationService.NavigateTo<AvatarSelectionViewModel>());
                     }
                     else
                     {
-                        Application.Current.Dispatcher.Invoke(() => 
+                        System.Windows.Application.Current.Dispatcher.Invoke(() => 
                             _navigationService.NavigateTo<PCRegistrationViewModel>());
                     }
                 });
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error durante la inicialización: {ex.Message}");
-                Application.Current.Dispatcher.Invoke(() => 
+                System.Windows.MessageBox.Show($"Error durante la inicialización: {ex.Message}");
+                System.Windows.Application.Current.Dispatcher.Invoke(() => 
                     _navigationService.NavigateTo<PCRegistrationViewModel>());
             }
         }

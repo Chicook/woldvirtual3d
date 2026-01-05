@@ -51,17 +51,17 @@ namespace WoldVirtual3DViewer.ViewModels
         {
             if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
             {
-                MessageBox.Show("Complete todos los campos.");
+                System.Windows.MessageBox.Show("Complete todos los campos.");
                 return;
             }
             if (Password != ConfirmPassword)
             {
-                MessageBox.Show("Las contraseñas no coinciden.");
+                System.Windows.MessageBox.Show("Las contraseñas no coinciden.");
                 return;
             }
             if (_registrationContext.PCInfo == null)
             {
-                MessageBox.Show("Error: Falta información del PC. Reiniciando proceso.");
+                System.Windows.MessageBox.Show("Error: Falta información del PC. Reiniciando proceso.");
                 _navigationService.NavigateTo<PCRegistrationViewModel>();
                 return;
             }
@@ -92,14 +92,14 @@ namespace WoldVirtual3DViewer.ViewModels
 
                 IsRegistered = true;
                 RegistrationStatus = "Usuario registrado.";
-                MessageBox.Show("Usuario registrado correctamente. Iniciando sesión...");
+                System.Windows.MessageBox.Show("Usuario registrado correctamente. Iniciando sesión...");
                 
                 _navigationService.NavigateTo<LoginViewModel>();
             }
             catch (Exception ex)
             {
                 RegistrationStatus = "Error en registro";
-                MessageBox.Show(ex.Message);
+                System.Windows.MessageBox.Show(ex.Message);
             }
         }
 
@@ -108,7 +108,7 @@ namespace WoldVirtual3DViewer.ViewModels
             var userAccount = _dataService.LoadUserAccount();
             if (userAccount == null)
             {
-                MessageBox.Show("No se encontró información de usuario para descargar.");
+                System.Windows.MessageBox.Show("No se encontró información de usuario para descargar.");
                 return;
             }
 
@@ -119,12 +119,12 @@ namespace WoldVirtual3DViewer.ViewModels
                 if (dialog.ShowDialog() == true)
                 {
                     System.IO.File.Copy(path, dialog.FileName, true);
-                    MessageBox.Show("Archivo de usuario guardado exitosamente.");
+                    System.Windows.MessageBox.Show("Archivo de usuario guardado exitosamente.");
                 }
             }
             catch (Exception ex) 
             { 
-                MessageBox.Show($"Error al guardar archivo: {ex.Message}"); 
+                System.Windows.MessageBox.Show($"Error al guardar archivo: {ex.Message}"); 
             }
         }
     }
