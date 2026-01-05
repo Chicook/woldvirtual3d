@@ -13,39 +13,41 @@ namespace WoldVirtual3DViewer.Services
 
         public GodotService()
         {
-            // Ruta al proyecto de Godot
-            _godotProjectPath = Path.Combine("D:", "woldvirtual3d");
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            
+            // Determinar la ruta del proyecto Godot de forma relativa
+            // 1. Intentar estructura de publicación (App/ -> woldvirtual3d/)
+            string potentialProjectRoot = Path.GetFullPath(Path.Combine(baseDir, "../../"));
+            
+            if (!File.Exists(Path.Combine(potentialProjectRoot, "project.godot")))
+            {
+                // 2. Intentar estructura de desarrollo (bin/Debug/net8.0-windows/ -> woldvirtual3d/)
+                potentialProjectRoot = Path.GetFullPath(Path.Combine(baseDir, "../../../../"));
+            }
 
-            // Intentar encontrar el ejecutable de Godot
+            // Si aún no se encuentra, usar ruta absoluta por defecto (fallback)
+            if (!File.Exists(Path.Combine(potentialProjectRoot, "project.godot")))
+            {
+                 potentialProjectRoot = Path.Combine("D:", "woldvirtual3d");
+            }
+
+            _godotProjectPath = potentialProjectRoot;
+
+            // Intentar encontrar el ejecutable de Godot localmente
             _godotExecutablePath = FindGodotExecutable();
         }
 
         private string? FindGodotExecutable()
         {
-            // Posibles ubicaciones del ejecutable de Godot
-            string[] possiblePaths = {
-                Path.Combine(_godotProjectPath, "Godot.exe"),
-                Path.Combine(_godotProjectPath, "Godot_v4.2.1.exe"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Godot", "Godot.exe"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Godot", "Godot.exe"),
-                "godot.exe" // En PATH
-            };
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            
+            // 1. Buscar en carpeta 'Godot' junto al ejecutable del visor (Portátil)
+            string localGodot = Path.Combine(baseDir, "Godot", "Godot.exe");
+            if (File.Exists(localGodot)) return localGodot;
 
-            foreach (string path in possiblePaths)
-            {
-                if (File.Exists(path))
-                {
-                    return path;
-                }
-            }
-
-            // Si no se encuentra, buscar en el directorio del visor
-            string viewerDir = AppDomain.CurrentDomain.BaseDirectory;
-            string embeddedGodot = Path.Combine(viewerDir, "Godot", "Godot.exe");
-            if (File.Exists(embeddedGodot))
-            {
-                return embeddedGodot;
-            }
+            // 2. Buscar en carpeta 'Godot' un nivel arriba (NDEXE/Godot)
+            string upperGodot = Path.Combine(baseDir, "..", "Godot", "Godot.exe");
+            if (File.Exists(upperGodot)) return Path.GetFullPath(upperGodot);
 
             return null;
         }

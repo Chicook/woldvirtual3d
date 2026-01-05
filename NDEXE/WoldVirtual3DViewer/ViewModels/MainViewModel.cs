@@ -517,6 +517,15 @@ namespace WoldVirtual3DViewer.ViewModels
                 
                 await Task.Run(() => 
                 {
+                    // Intentar recargar usuario por si hubo cambios externos
+                    var currentAccount = _dataService.LoadUserAccount();
+                    
+                    if (currentAccount == null)
+                    {
+                         // No hay usuario registrado
+                         return;
+                    }
+
                     isValid = _dataService.ValidateUserCredentials(LoginUsername, LoginPassword);
                     if (isValid)
                     {
@@ -536,8 +545,23 @@ namespace WoldVirtual3DViewer.ViewModels
                 }
                 else
                 {
-                    LoginStatus = "Usuario o contraseña incorrectos";
-                    MessageBox.Show("Usuario o contraseña incorrectos", "Error de Autenticación", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    // Verificar por qué falló para dar mejor feedback
+                    var checkAccount = _dataService.LoadUserAccount();
+                    if (checkAccount == null)
+                    {
+                        LoginStatus = "No hay ningún usuario registrado en este equipo.";
+                        MessageBox.Show("No se encontró ninguna cuenta de usuario registrada.\nPor favor, regístrese primero.", "Cuenta no encontrada", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                    else if (!string.Equals(checkAccount.Username, LoginUsername, StringComparison.OrdinalIgnoreCase))
+                    {
+                        LoginStatus = "El nombre de usuario no coincide con el registrado.";
+                        MessageBox.Show($"El usuario '{LoginUsername}' no coincide con la cuenta registrada en este equipo.", "Usuario Incorrecto", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                    else
+                    {
+                        LoginStatus = "Contraseña incorrecta.";
+                        MessageBox.Show("La contraseña ingresada es incorrecta.", "Error de Autenticación", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
                 }
             }
             catch (Exception ex)
