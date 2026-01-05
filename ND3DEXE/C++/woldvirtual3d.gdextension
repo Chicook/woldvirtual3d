@@ -1,0 +1,15 @@
+[configuration]
+
+entry_symbol = "woldvirtual3d_library_init"
+compatibility_minimum = "4.5"
+reloadable = true
+
+[libraries]
+
+windows.debug.x86_64 = "res://ND3DEXE/C++/bin/libwoldvirtual3d.windows.debug.x86_64.dll"
+windows.release.x86_64 = "res://ND3DEXE/C++/bin/libwoldvirtual3d.windows.release.x86_64.dll"
+linux.debug.x86_64 = "res://ND3DEXE/C++/bin/libwoldvirtual3d.linux.debug.x86_64.so"
+linux.release.x86_64 = "res://ND3DEXE/C++/bin/libwoldvirtual3d.linux.release.x86_64.so"
+macos.debug = "res://ND3DEXE/C++/bin/libwoldvirtual3d.macos.debug.framework"
+macos.release = "res://ND3DEXE/C++/bin/libwoldvirtual3d.macos.release.framework"
+
