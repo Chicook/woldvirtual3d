@@ -56,7 +56,8 @@ namespace WoldVirtual3D.Viewer.Services
 
                 var json = JsonSerializer.Serialize(userData, jsonOptions);
                 var fileName = $"user_data_{userData.Username}_{DateTime.Now:yyyyMMdd_HHmmss}.json";
-                var filePath = Path.GetFullPath(Path.Combine(_userVSPath, fileName));
+                // Usar ruta absoluta completa directamente (sin Path.Combine ni Path.GetFullPath)
+                var filePath = _userVSPath.TrimEnd('\\', '/') + @"\" + fileName;
                 
                 await File.WriteAllTextAsync(filePath, json);
                 
@@ -95,31 +96,59 @@ namespace WoldVirtual3D.Viewer.Services
 
                 var json = JsonSerializer.Serialize(userData, jsonOptions);
                 
-                // Usar ruta absoluta directa sin Path.GetFullPath para evitar resolución incorrecta
-                var filePath = Path.Combine(_userVSPath, "user_data.json");
+                // Construir ruta absoluta completa y normalizarla
+                var filePathRaw = _userVSPath.TrimEnd('\\', '/') + @"\user_data.json";
+                var filePath = Path.GetFullPath(filePathRaw);
                 
-                System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Ruta base: {_userVSPath}");
-                System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Ruta completa del archivo: {filePath}");
-                System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Directorio existe: {Directory.Exists(_userVSPath)}");
+                // Verificar que el directorio existe antes de escribir
+                var dirPath = Path.GetDirectoryName(filePath);
+                if (!string.IsNullOrEmpty(dirPath) && !Directory.Exists(dirPath))
+                {
+                    Directory.CreateDirectory(dirPath);
+                    System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Directorio creado: {dirPath}");
+                    System.Console.WriteLine($"[UserDataStorage] Directorio creado: {dirPath}");
+                }
+                
+                System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Ruta base original: {_userVSPath}");
+                System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Ruta raw: {filePathRaw}");
+                System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Ruta normalizada: {filePath}");
+                System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Directorio existe: {Directory.Exists(dirPath ?? "")}");
+                System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Directorio actual de trabajo: {Directory.GetCurrentDirectory()}");
                 System.Console.WriteLine($"[UserDataStorage] Ruta base: {_userVSPath}");
-                System.Console.WriteLine($"[UserDataStorage] Ruta completa del archivo: {filePath}");
-                System.Console.WriteLine($"[UserDataStorage] Directorio existe: {Directory.Exists(_userVSPath)}");
+                System.Console.WriteLine($"[UserDataStorage] Ruta normalizada completa: {filePath}");
+                System.Console.WriteLine($"[UserDataStorage] Directorio existe: {Directory.Exists(dirPath ?? "")}");
+                System.Console.WriteLine($"[UserDataStorage] Directorio actual: {Directory.GetCurrentDirectory()}");
                 
                 await File.WriteAllTextAsync(filePath, json);
                 
-                // Verificar que el archivo se guardó correctamente
-                var fileExists = File.Exists(filePath);
+                // Forzar escritura inmediata
+                System.Threading.Thread.Sleep(100);
+                
+                // Verificar que el archivo se guardó correctamente usando la ruta completa normalizada
+                var normalizedPath = Path.GetFullPath(filePath);
+                var fileExists = File.Exists(normalizedPath);
+                
                 if (fileExists)
                 {
-                    var fileInfo = new FileInfo(filePath);
+                    var fileInfo = new FileInfo(normalizedPath);
                     System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Archivo guardado exitosamente. Tamaño: {fileInfo.Length} bytes");
-                    System.Console.WriteLine($"[UserDataStorage] JSON guardado exitosamente en: {filePath}");
+                    System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Ruta normalizada: {normalizedPath}");
+                    System.Console.WriteLine($"[UserDataStorage] JSON guardado exitosamente en: {normalizedPath}");
                     System.Console.WriteLine($"[UserDataStorage] Tamaño del archivo: {fileInfo.Length} bytes");
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine($"[UserDataStorage] ERROR: El archivo no existe después de guardarlo");
+                    // Intentar encontrar el archivo en otras ubicaciones posibles
+                    var currentDir = Directory.GetCurrentDirectory();
+                    var possiblePath = Path.Combine(currentDir, "user_data.json");
+                    var existsInCurrentDir = File.Exists(possiblePath);
+                    
+                    System.Diagnostics.Debug.WriteLine($"[UserDataStorage] ERROR: El archivo no existe en: {normalizedPath}");
+                    System.Diagnostics.Debug.WriteLine($"[UserDataStorage] Directorio actual: {currentDir}");
+                    System.Diagnostics.Debug.WriteLine($"[UserDataStorage] ¿Existe en directorio actual?: {existsInCurrentDir}");
                     System.Console.WriteLine($"[UserDataStorage] ERROR: El archivo no existe después de guardarlo");
+                    System.Console.WriteLine($"[UserDataStorage] Intentado guardar en: {normalizedPath}");
+                    System.Console.WriteLine($"[UserDataStorage] Directorio actual: {currentDir}");
                 }
             }
             catch (Exception ex)
@@ -139,7 +168,8 @@ namespace WoldVirtual3D.Viewer.Services
         {
             try
             {
-                var filePath = Path.GetFullPath(Path.Combine(_userVSPath, "user_data.json"));
+                // Usar ruta absoluta completa directamente (sin Path.Combine ni Path.GetFullPath)
+                var filePath = _userVSPath.TrimEnd('\\', '/') + @"\user_data.json";
                 
                 if (!File.Exists(filePath))
                 {

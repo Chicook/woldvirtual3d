@@ -377,6 +377,9 @@ namespace WoldVirtual3D.Viewer.Forms
 
             _viewer3D = new Viewer3D();
             _viewer3D.Initialize(_viewerPanel);
+            
+            // Cargar la escena bsprincipal.tscn después de inicializar
+            _viewer3D.LoadGodotScene("res://bsprincipal.tscn");
         }
 
         private void Viewer3DForm_FormClosing(object? sender, FormClosingEventArgs e)

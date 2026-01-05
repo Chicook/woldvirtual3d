@@ -175,6 +175,28 @@ namespace WoldVirtual3D.Viewer
                         
                         var passwordHash = HashPassword(password);
                         
+                        // Debug: verificar si el usuario existe
+                        var checkUserCmd = @"SELECT username, password_hash FROM users WHERE username = @username";
+                        using (var checkCmd = new SQLiteCommand(checkUserCmd, conn))
+                        {
+                            checkCmd.Parameters.AddWithValue("@username", username);
+                            using (var checkReader = checkCmd.ExecuteReader())
+                            {
+                                if (checkReader.Read())
+                                {
+                                    var storedHash = checkReader.GetString(1);
+                                    System.Diagnostics.Debug.WriteLine($"[UserDatabase] Usuario encontrado: {username}");
+                                    System.Diagnostics.Debug.WriteLine($"[UserDatabase] Hash almacenado: {storedHash}");
+                                    System.Diagnostics.Debug.WriteLine($"[UserDatabase] Hash calculado: {passwordHash}");
+                                    System.Diagnostics.Debug.WriteLine($"[UserDatabase] Coinciden: {storedHash == passwordHash}");
+                                }
+                                else
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"[UserDatabase] Usuario NO encontrado: {username}");
+                                }
+                            }
+                        }
+                        
                         var selectCmd = @"
                             SELECT id, username, email, created_at, last_login
                             FROM users
@@ -191,6 +213,7 @@ namespace WoldVirtual3D.Viewer
                             {
                                 if (reader.Read())
                                 {
+                                    System.Diagnostics.Debug.WriteLine($"[UserDatabase] Autenticacion exitosa para: {username}");
                                     return new UserData
                                     {
                                         Id = reader.GetString(0),
@@ -200,6 +223,10 @@ namespace WoldVirtual3D.Viewer
                                         LastLogin = reader.IsDBNull(4) ? "" : reader.GetString(4)
                                     };
                                 }
+                                else
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"[UserDatabase] Autenticacion fallida para: {username}");
+                                }
                             }
                         }
 
@@ -208,7 +235,8 @@ namespace WoldVirtual3D.Viewer
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"UserDatabase: Error en autenticacion: {ex.Message}");
+                    System.Diagnostics.Debug.WriteLine($"[UserDatabase] Error en autenticacion: {ex.Message}");
+                    System.Diagnostics.Debug.WriteLine($"[UserDatabase] StackTrace: {ex.StackTrace}");
                     return null;
                 }
             });
