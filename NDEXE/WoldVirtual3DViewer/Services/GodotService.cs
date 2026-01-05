@@ -37,7 +37,7 @@ namespace WoldVirtual3DViewer.Services
             _godotExecutablePath = FindGodotExecutable();
         }
 
-        private string? FindGodotExecutable()
+        private static string? FindGodotExecutable()
         {
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             

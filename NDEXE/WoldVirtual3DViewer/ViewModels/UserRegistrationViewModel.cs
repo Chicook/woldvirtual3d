@@ -4,14 +4,9 @@ using WoldVirtual3DViewer.Models;
 
 namespace WoldVirtual3DViewer.ViewModels
 {
-    public class UserRegistrationViewModel : INotifyPropertyChanged
+    public class UserRegistrationViewModel(MainViewModel mainViewModel) : INotifyPropertyChanged
     {
-        private readonly MainViewModel _mainViewModel;
-
-        public UserRegistrationViewModel(MainViewModel mainViewModel)
-        {
-            _mainViewModel = mainViewModel;
-        }
+        private readonly MainViewModel _mainViewModel = mainViewModel;
 
         // Propiedades delegadas al MainViewModel
         public string Username

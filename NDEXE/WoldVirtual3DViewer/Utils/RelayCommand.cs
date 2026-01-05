@@ -3,38 +3,10 @@ using System.Windows.Input;
 
 namespace WoldVirtual3DViewer.Utils
 {
-    public class RelayCommand : ICommand
+    public class RelayCommand(Action execute, Func<bool>? canExecute = null) : ICommand
     {
-        private readonly Action _execute;
-        private readonly Func<bool>? _canExecute;
-
-        public RelayCommand(Action execute, Func<bool>? canExecute = null)
-        {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute;
-        }
-
-        public event EventHandler? CanExecuteChanged
-        {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
-        }
-
-        public bool CanExecute(object? parameter) => _canExecute == null || _canExecute();
-
-        public void Execute(object? parameter) => _execute();
-    }
-
-    public class RelayCommand<T> : ICommand
-    {
-        private readonly Action<T?> _execute;
-        private readonly Func<T?, bool>? _canExecute;
-
-        public RelayCommand(Action<T?> execute, Func<T?, bool>? canExecute = null)
-        {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute;
-        }
+        private readonly Action _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+        private readonly Func<bool>? _canExecute = canExecute;
 
         public event EventHandler? CanExecuteChanged
         {
@@ -44,16 +16,34 @@ namespace WoldVirtual3DViewer.Utils
 
         public bool CanExecute(object? parameter)
         {
-            if (_canExecute == null) return true;
-            if (parameter == null && default(T) == null) return _canExecute(default);
-            if (parameter is T t) return _canExecute(t);
-            return false;
+            return _canExecute == null || _canExecute();
         }
 
         public void Execute(object? parameter)
         {
-            if (parameter == null && default(T) == null) _execute(default);
-            else if (parameter is T t) _execute(t);
+            _execute();
+        }
+    }
+
+    public class RelayCommand<T>(Action<T?> execute, Predicate<T?>? canExecute = null) : ICommand
+    {
+        private readonly Action<T?> _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+        private readonly Predicate<T?>? _canExecute = canExecute;
+
+        public event EventHandler? CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
+        public bool CanExecute(object? parameter)
+        {
+            return _canExecute == null || _canExecute((T?)parameter);
+        }
+
+        public void Execute(object? parameter)
+        {
+            _execute((T?)parameter);
         }
     }
 }

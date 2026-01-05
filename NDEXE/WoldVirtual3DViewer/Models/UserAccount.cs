@@ -23,11 +23,8 @@ namespace WoldVirtual3DViewer.Models
 
         public void SetPassword(string password)
         {
-            using (var sha256 = SHA256.Create())
-            {
-                byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                PasswordHash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
-            }
+            byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(password));
+            PasswordHash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
         }
 
         public bool VerifyPassword(string password)
@@ -35,12 +32,9 @@ namespace WoldVirtual3DViewer.Models
             if (string.IsNullOrEmpty(PasswordHash))
                 return false;
 
-            using (var sha256 = SHA256.Create())
-            {
-                byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                string inputHash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
-                return string.Equals(PasswordHash, inputHash, StringComparison.OrdinalIgnoreCase);
-            }
+            byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(password));
+            string inputHash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+            return string.Equals(PasswordHash, inputHash, StringComparison.OrdinalIgnoreCase);
         }
 
         public void GenerateAccountHash()
@@ -51,11 +45,8 @@ namespace WoldVirtual3DViewer.Models
             }
 
             string combinedInfo = $"{Username}|{PasswordHash}|{PCUniqueHash}|{CreationDate:yyyyMMddHHmmss}";
-            using (var sha256 = SHA256.Create())
-            {
-                byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(combinedInfo));
-                AccountHash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
-            }
+            byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(combinedInfo));
+            AccountHash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
         }
     }
 }

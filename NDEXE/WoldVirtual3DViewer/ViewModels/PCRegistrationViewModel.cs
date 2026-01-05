@@ -3,23 +3,18 @@ using System.Runtime.CompilerServices;
 
 namespace WoldVirtual3DViewer.ViewModels
 {
-    public class PCRegistrationViewModel : INotifyPropertyChanged
+    public class PCRegistrationViewModel(MainViewModel mainViewModel) : INotifyPropertyChanged
     {
-        private readonly MainViewModel _mainViewModel;
-
-        public PCRegistrationViewModel(MainViewModel mainViewModel)
-        {
-            _mainViewModel = mainViewModel;
-        }
+        private readonly MainViewModel _mainViewModel = mainViewModel;
 
         // Propiedades delegadas al MainViewModel
-        public Models.PCInfo? PCInfo => _mainViewModel.PCInfo;
-        public string PCRegistrationStatus => _mainViewModel.PCRegistrationStatus;
-        public bool IsPCRegistered => _mainViewModel.IsPCRegistered;
+        public string RegistrationStatus => _mainViewModel.PCRegistrationStatus;
+        public PCInfo? PCInfo => _mainViewModel.PCInfo;
+        public bool IsRegistered => _mainViewModel.IsPCRegistered;
 
         // Comandos delegados
-        public System.Windows.Input.ICommand RegisterPCCommand => _mainViewModel.RegisterPCCommand;
-        public System.Windows.Input.ICommand DownloadPCHashCommand => _mainViewModel.DownloadPCHashCommand;
+        public ICommand RegisterPCCommand => _mainViewModel.RegisterPCCommand;
+        public ICommand DownloadHashCommand => _mainViewModel.DownloadPCHashCommand;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -27,6 +22,7 @@ namespace WoldVirtual3DViewer.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+    }
 
         // Notificar cambios cuando cambie el estado en MainViewModel
         public void NotifyStateChanged()
