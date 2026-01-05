@@ -14,7 +14,7 @@ namespace WoldVirtual3DViewer.Views
         {
             if (DataContext is UserRegistrationViewModel viewModel)
             {
-                viewModel.Password = PasswordBox.Password;
+                viewModel.Password = UserPasswordBox.Password;
             }
         }
 

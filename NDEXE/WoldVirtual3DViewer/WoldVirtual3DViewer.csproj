@@ -32,4 +32,5 @@
     <Folder Include="Utils\" />
   </ItemGroup>
 
+  <!-- Trigger Project Reload -->
 </Project>

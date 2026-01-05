@@ -105,7 +105,7 @@
                         <Label Content="Contraseña:"
                                Style="{StaticResource ModernLabelStyle}"
                                Margin="0,0,0,5"/>
-                        <PasswordBox x:Name="PasswordBox"
+                        <PasswordBox x:Name="UserPasswordBox"
                                     Style="{StaticResource ModernPasswordBoxStyle}"
                                     Width="300"
                                     HorizontalAlignment="Left"

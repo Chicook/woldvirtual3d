@@ -7,7 +7,7 @@ namespace WoldVirtual3DViewer.Views
     {
         public LoginView()
         {
-            InitializeComponent();
+            InitializeComponent(); 
         }
 
         private void LoginPasswordBox_PasswordChanged(object sender, System.Windows.RoutedEventArgs e)

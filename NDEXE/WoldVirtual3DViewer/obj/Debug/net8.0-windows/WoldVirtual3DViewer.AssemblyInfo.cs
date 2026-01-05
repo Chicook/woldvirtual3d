@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WoldVirtual3DViewer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ea60a397f3a37b3d89ce10bba0b68809ecf95a90")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c63a57390d5c57b5fa7331f41a25bbcb2bec6bdd")]
 [assembly: System.Reflection.AssemblyProductAttribute("WoldVirtual3DViewer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WoldVirtual3D Viewer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
