@@ -5,7 +5,7 @@ namespace WoldVirtual3DViewer.Utils
 {
     public static class Logger
     {
-        private static string LogPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "viewer_debug.log");
+        private static readonly string LogPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "viewer_debug.log");
 
         public static void Log(string message)
         {
