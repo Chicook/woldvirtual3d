@@ -16,10 +16,6 @@ namespace WoldVirtual3DViewer.Views
             {
                 viewModel.LoginPassword = LoginPasswordBox.Password;
             }
-            else if (DataContext is MainViewModel mainViewModel)
-            {
-                mainViewModel.LoginPassword = LoginPasswordBox.Password;
-            }
         }
     }
 }

@@ -1,32 +1,48 @@
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 using WoldVirtual3DViewer.Models;
+using WoldVirtual3DViewer.Services;
+using WoldVirtual3DViewer.Utils;
 
 namespace WoldVirtual3DViewer.ViewModels
 {
     public class AvatarSelectionViewModel : ViewModelBase
     {
-        private readonly MainViewModel _mainViewModel;
+        private readonly INavigationService _navigationService;
+        private readonly RegistrationContext _registrationContext;
 
-        public AvatarSelectionViewModel(MainViewModel mainViewModel)
-        {
-            _mainViewModel = mainViewModel;
-            _mainViewModel.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == nameof(MainViewModel.AvailableAvatars)) OnPropertyChanged(nameof(Avatars));
-                else if (e.PropertyName == nameof(MainViewModel.SelectedAvatar)) OnPropertyChanged(nameof(SelectedAvatar));
-            };
-        }
+        public ObservableCollection<AvatarInfo> Avatars { get; }
 
-        // Propiedades delegadas
-        public ObservableCollection<AvatarInfo> Avatars => _mainViewModel.AvailableAvatars;
-
+        private AvatarInfo? _selectedAvatar;
         public AvatarInfo? SelectedAvatar
         {
-            get => _mainViewModel.SelectedAvatar;
-            set => _mainViewModel.SelectedAvatar = value;
+            get => _selectedAvatar;
+            set => SetProperty(ref _selectedAvatar, value);
         }
 
-        // Comando delegado
-        public System.Windows.Input.ICommand SelectAvatarCommand => _mainViewModel.SelectAvatarCommand;
+        public ICommand SelectAvatarCommand { get; }
+
+        public AvatarSelectionViewModel(
+            INavigationService navigationService,
+            RegistrationContext registrationContext)
+        {
+            _navigationService = navigationService;
+            _registrationContext = registrationContext;
+
+            Avatars = new ObservableCollection<AvatarInfo>(AvatarInfo.GetAvailableAvatars());
+            if (Avatars.Count > 0) SelectedAvatar = Avatars[0];
+
+            SelectAvatarCommand = new RelayCommand<AvatarInfo?>(SelectAvatar);
+        }
+
+        private void SelectAvatar(AvatarInfo? avatar)
+        {
+            if (avatar != null)
+            {
+                SelectedAvatar = avatar;
+                _registrationContext.SelectedAvatar = avatar;
+                _navigationService.NavigateTo<UserRegistrationViewModel>();
+            }
+        }
     }
 }

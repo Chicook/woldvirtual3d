@@ -1,53 +1,60 @@
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Windows;
+using WoldVirtual3DViewer.Services;
+using WoldVirtual3DViewer.ViewModels;
+using WoldVirtual3DViewer.Views;
 
 namespace WoldVirtual3DViewer
 {
     public partial class App : Application
     {
+        public IServiceProvider Services { get; }
+
         public App()
         {
-            // Manejador global de excepciones para evitar cierres inesperados
-            this.DispatcherUnhandledException += App_DispatcherUnhandledException;
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            Services = ConfigureServices();
         }
 
-        private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        private static ServiceProvider ConfigureServices()
         {
-            MessageBox.Show($"Ocurrió un error inesperado: {e.Exception.Message}\n\nStackTrace: {e.Exception.StackTrace}", 
-                "Error Inesperado", MessageBoxButton.OK, MessageBoxImage.Error);
-            e.Handled = true; // Evitar que la aplicación se cierre
-        }
+            var services = new ServiceCollection();
 
-        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            if (e.ExceptionObject is Exception ex)
-            {
-                MessageBox.Show($"Error crítico del sistema: {ex.Message}\n\nStackTrace: {ex.StackTrace}", 
-                    "Error Crítico", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            // Services
+            services.AddSingleton<HardwareService>();
+            services.AddSingleton<DataService>();
+            services.AddSingleton<GodotService>();
+            services.AddSingleton<RegistrationContext>();
+
+            // Navigation Service with Factory
+            services.AddSingleton<INavigationService>(provider =>
+                new NavigationService(type => (ViewModelBase)provider.GetRequiredService(type)));
+
+            // ViewModels
+            services.AddSingleton<MainViewModel>();
+            services.AddTransient<LoadingViewModel>();
+            services.AddTransient<PCRegistrationViewModel>();
+            services.AddTransient<AvatarSelectionViewModel>();
+            services.AddTransient<UserRegistrationViewModel>();
+            services.AddTransient<LoginViewModel>();
+
+            // Views
+            services.AddTransient<MainWindow>();
+
+            return services.BuildServiceProvider();
         }
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
-            // TODO: Configurar el tema oscuro de la aplicación
-            // Comentado temporalmente para debugging
-            /*
-            try
-            {
-                var darkTheme = new ResourceDictionary
-                {
-                    Source = new Uri("Themes/DarkTheme.xaml", UriKind.Relative)
-                };
-                Resources.MergedDictionaries.Add(darkTheme);
-            }
-            catch (Exception ex)
-            {
-                // Si hay error con el tema, continuar sin él
-                System.Diagnostics.Debug.WriteLine($"Error cargando tema: {ex.Message}");
-            }
-            */
+            var mainWindow = Services.GetRequiredService<MainWindow>();
+            
+            // Start navigation
+            var navigationService = Services.GetRequiredService<INavigationService>();
+            navigationService.NavigateTo<LoadingViewModel>();
+
+            mainWindow.Show();
         }
     }
 }

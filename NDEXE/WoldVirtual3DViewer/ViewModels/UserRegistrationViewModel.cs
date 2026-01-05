@@ -1,51 +1,131 @@
+using System;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using WoldVirtual3DViewer.Models;
+using WoldVirtual3DViewer.Services;
+using WoldVirtual3DViewer.Utils;
 
 namespace WoldVirtual3DViewer.ViewModels
 {
     public class UserRegistrationViewModel : ViewModelBase
     {
-        private readonly MainViewModel _mainViewModel;
+        private readonly DataService _dataService;
+        private readonly INavigationService _navigationService;
+        private readonly RegistrationContext _registrationContext;
 
-        public UserRegistrationViewModel(MainViewModel mainViewModel)
+        private string _username = string.Empty;
+        public string Username { get => _username; set => SetProperty(ref _username, value); }
+
+        private string _password = string.Empty;
+        public string Password { get => _password; set => SetProperty(ref _password, value); }
+
+        private string _confirmPassword = string.Empty;
+        public string ConfirmPassword { get => _confirmPassword; set => SetProperty(ref _confirmPassword, value); }
+
+        private string _status = string.Empty;
+        public string RegistrationStatus { get => _status; set => SetProperty(ref _status, value); }
+
+        private bool _isRegistered;
+        public bool IsRegistered { get => _isRegistered; set => SetProperty(ref _isRegistered, value); }
+
+        public AvatarInfo? SelectedAvatar => _registrationContext.SelectedAvatar;
+
+        public ICommand RegisterUserCommand { get; }
+        public ICommand DownloadHashCommand { get; }
+
+        public UserRegistrationViewModel(
+            DataService dataService,
+            INavigationService navigationService,
+            RegistrationContext registrationContext)
         {
-            _mainViewModel = mainViewModel;
-            _mainViewModel.PropertyChanged += (s, e) =>
+            _dataService = dataService;
+            _navigationService = navigationService;
+            _registrationContext = registrationContext;
+
+            RegisterUserCommand = new RelayCommand(async () => await RegisterUserAsync());
+            DownloadHashCommand = new RelayCommand(DownloadUserHash);
+        }
+
+        private async Task RegisterUserAsync()
+        {
+            if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
             {
-                if (e.PropertyName == nameof(MainViewModel.Username)) OnPropertyChanged(nameof(Username));
-                else if (e.PropertyName == nameof(MainViewModel.Password)) OnPropertyChanged(nameof(Password));
-                else if (e.PropertyName == nameof(MainViewModel.ConfirmPassword)) OnPropertyChanged(nameof(ConfirmPassword));
-                else if (e.PropertyName == nameof(MainViewModel.SelectedAvatar)) OnPropertyChanged(nameof(SelectedAvatar));
-                else if (e.PropertyName == nameof(MainViewModel.UserRegistrationStatus)) OnPropertyChanged(nameof(UserRegistrationStatus));
-                else if (e.PropertyName == nameof(MainViewModel.IsUserRegistered)) OnPropertyChanged(nameof(IsUserRegistered));
-            };
+                MessageBox.Show("Complete todos los campos.");
+                return;
+            }
+            if (Password != ConfirmPassword)
+            {
+                MessageBox.Show("Las contraseñas no coinciden.");
+                return;
+            }
+            if (_registrationContext.PCInfo == null)
+            {
+                MessageBox.Show("Error: Falta información del PC. Reiniciando proceso.");
+                _navigationService.NavigateTo<PCRegistrationViewModel>();
+                return;
+            }
+
+            try
+            {
+                RegistrationStatus = "Registrando usuario...";
+                
+                // Capture values for thread safety
+                string u = Username;
+                string p = Password;
+                string a = SelectedAvatar?.Type ?? "chica";
+                string h = _registrationContext.PCInfo.UniqueHash ?? "unknown";
+
+                await Task.Run(() =>
+                {
+                    var account = new UserAccount
+                    {
+                        Username = u,
+                        AvatarType = a,
+                        PCUniqueHash = h,
+                        IsValidated = true
+                    };
+                    account.SetPassword(p);
+                    account.GenerateAccountHash();
+                    _dataService.SaveUserAccount(account);
+                });
+
+                IsRegistered = true;
+                RegistrationStatus = "Usuario registrado.";
+                MessageBox.Show("Usuario registrado correctamente. Iniciando sesión...");
+                
+                _navigationService.NavigateTo<LoginViewModel>();
+            }
+            catch (Exception ex)
+            {
+                RegistrationStatus = "Error en registro";
+                MessageBox.Show(ex.Message);
+            }
         }
 
-        // Propiedades delegadas al MainViewModel
-        public string Username
+        private void DownloadUserHash()
         {
-            get => _mainViewModel.Username;
-            set => _mainViewModel.Username = value;
+            var userAccount = _dataService.LoadUserAccount();
+            if (userAccount == null)
+            {
+                MessageBox.Show("No se encontró información de usuario para descargar.");
+                return;
+            }
+
+            try
+            {
+                string path = _dataService.CreateUserAccountZip(userAccount);
+                var dialog = new Microsoft.Win32.SaveFileDialog { FileName = $"user_{userAccount.AccountHash}.zip" };
+                if (dialog.ShowDialog() == true)
+                {
+                    System.IO.File.Copy(path, dialog.FileName, true);
+                    MessageBox.Show("Archivo de usuario guardado exitosamente.");
+                }
+            }
+            catch (Exception ex) 
+            { 
+                MessageBox.Show($"Error al guardar archivo: {ex.Message}"); 
+            }
         }
-
-        public string Password
-        {
-            get => _mainViewModel.Password;
-            set => _mainViewModel.Password = value;
-        }
-
-        public string ConfirmPassword
-        {
-            get => _mainViewModel.ConfirmPassword;
-            set => _mainViewModel.ConfirmPassword = value;
-        }
-
-        public AvatarInfo? SelectedAvatar => _mainViewModel.SelectedAvatar;
-        public string UserRegistrationStatus => _mainViewModel.UserRegistrationStatus;
-        public bool IsUserRegistered => _mainViewModel.IsUserRegistered;
-
-        // Comandos delegados
-        public ICommand RegisterUserCommand => _mainViewModel.RegisterUserCommand;
-        public ICommand DownloadUserHashCommand => _mainViewModel.DownloadUserHashCommand;
     }
 }

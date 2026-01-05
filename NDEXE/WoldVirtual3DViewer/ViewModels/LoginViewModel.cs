@@ -1,47 +1,123 @@
-using System.ComponentModel;
+using System;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+using WoldVirtual3DViewer.Models;
+using WoldVirtual3DViewer.Services;
+using WoldVirtual3DViewer.Utils;
 
 namespace WoldVirtual3DViewer.ViewModels
 {
     public class LoginViewModel : ViewModelBase
     {
-        private readonly MainViewModel _mainViewModel;
+        private readonly DataService _dataService;
+        private readonly GodotService _godotService;
+        private readonly INavigationService _navigationService;
 
-        public LoginViewModel(MainViewModel mainViewModel)
+        private string _username = string.Empty;
+        public string LoginUsername { get => _username; set => SetProperty(ref _username, value); }
+
+        private string _password = string.Empty;
+        public string LoginPassword { get => _password; set => SetProperty(ref _password, value); }
+
+        private string _status = string.Empty;
+        public string LoginStatus { get => _status; set => SetProperty(ref _status, value); }
+
+        private bool _isLoggedIn;
+        public bool IsLoggedIn { get => _isLoggedIn; set => SetProperty(ref _isLoggedIn, value); }
+
+        public ICommand LoginCommand { get; }
+
+        public LoginViewModel(
+            DataService dataService, 
+            GodotService godotService,
+            INavigationService navigationService)
         {
-            _mainViewModel = mainViewModel;
-            _mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
+            _dataService = dataService;
+            _godotService = godotService;
+            _navigationService = navigationService;
+
+            LoginCommand = new RelayCommand(async () => await LoginAsync());
+            
+            // Pre-fill if possible (optional, maybe passed via context later)
         }
 
-        private void MainViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private async Task LoginAsync()
         {
-            // Propagar cambios de propiedades relevantes
-            if (e.PropertyName == nameof(MainViewModel.LoginUsername))
-                OnPropertyChanged(nameof(LoginUsername));
-            else if (e.PropertyName == nameof(MainViewModel.LoginPassword))
-                OnPropertyChanged(nameof(LoginPassword));
-            else if (e.PropertyName == nameof(MainViewModel.LoginStatus))
-                OnPropertyChanged(nameof(LoginStatus));
-            else if (e.PropertyName == nameof(MainViewModel.IsLoggedIn))
-                OnPropertyChanged(nameof(IsLoggedIn));
+            LoginStatus = "Verificando...";
+            try
+            {
+                bool success = false;
+                UserAccount? account = null;
+                
+                string u = LoginUsername;
+                string p = LoginPassword;
+
+                await Task.Run(() =>
+                {
+                    account = _dataService.LoadUserAccount();
+                    if (account != null && account.IsValidated && 
+                        account.Username == u && account.VerifyPassword(p))
+                    {
+                        success = true;
+                    }
+                });
+
+                if (success && account != null)
+                {
+                    IsLoggedIn = true;
+                    LoginStatus = "Conectado. Iniciando Godot...";
+                    await LaunchGodotAsync(account);
+                }
+                else
+                {
+                    LoginStatus = "Credenciales incorrectas.";
+                    MessageBox.Show("Usuario o contraseña incorrectos.");
+                }
+            }
+            catch (Exception ex)
+            {
+                LoginStatus = "Error";
+                Logger.LogError("Login error", ex);
+                MessageBox.Show(ex.Message);
+            }
         }
 
-        // Propiedades delegadas al MainViewModel
-        public string LoginUsername
+        private async Task LaunchGodotAsync(UserAccount account)
         {
-            get => _mainViewModel.LoginUsername;
-            set => _mainViewModel.LoginUsername = value;
+            try 
+            {
+                if (!_godotService.IsGodotAvailable())
+                {
+                    // Manual search logic
+                    if (MessageBox.Show("No se encuentra Godot.exe. ¿Buscar manualmente?", "Godot", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    {
+                        var dialog = new Microsoft.Win32.OpenFileDialog { Filter = "Godot.exe|*.exe" };
+                        if (dialog.ShowDialog() == true)
+                        {
+                            _godotService.SetGodotExecutablePath(dialog.FileName);
+                        }
+                        else return;
+                    }
+                    else return;
+                }
+
+                if (!_godotService.IsProjectValid())
+                {
+                    MessageBox.Show("No se encuentra el proyecto (project.godot).");
+                    return;
+                }
+
+                bool launched = await _godotService.LaunchGodotSceneAsync(account);
+                if (launched)
+                {
+                    Application.Current.Shutdown();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al lanzar Godot: {ex.Message}");
+            }
         }
-
-        public string LoginPassword
-        {
-            get => _mainViewModel.LoginPassword;
-            set => _mainViewModel.LoginPassword = value;
-        }
-
-        public string LoginStatus => _mainViewModel.LoginStatus;
-        public bool IsLoggedIn => _mainViewModel.IsLoggedIn;
-
-        // Comandos delegados
-        public System.Windows.Input.ICommand LoginCommand => _mainViewModel.LoginCommand;
     }
 }
