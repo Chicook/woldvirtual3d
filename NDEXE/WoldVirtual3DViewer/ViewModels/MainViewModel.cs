@@ -640,9 +640,41 @@ namespace WoldVirtual3DViewer.ViewModels
                 Logger.Log("Verificando disponibilidad de Godot...");
                 if (!_godotService.IsGodotAvailable())
                 {
-                    Logger.Log("Godot no disponible.");
-                    MessageBox.Show("Godot no está disponible. Asegúrese de que esté instalado en App/Godot/Godot.exe.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
+                    Logger.Log("Godot no disponible automáticamente.");
+                    
+                    var result = MessageBox.Show(
+                        "No se encontró el ejecutable de Godot (Godot.exe).\n¿Desea buscarlo manualmente?", 
+                        "Godot No Encontrado", 
+                        MessageBoxButton.YesNo, 
+                        MessageBoxImage.Question);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        var openFileDialog = new OpenFileDialog
+                        {
+                            Filter = "Ejecutable de Godot (Godot*.exe)|Godot*.exe|Todos los archivos (*.*)|*.*",
+                            Title = "Seleccionar ejecutable de Godot Engine"
+                        };
+
+                        if (openFileDialog.ShowDialog() == true)
+                        {
+                            _godotService.SetGodotExecutablePath(openFileDialog.FileName);
+                            // Reintentar verificación
+                            if (!_godotService.IsGodotAvailable())
+                            {
+                                MessageBox.Show("El archivo seleccionado no parece ser válido.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            return; // Usuario canceló
+                        }
+                    }
+                    else
+                    {
+                        return; // Usuario no quiso buscar
+                    }
                 }
 
                 if (!_godotService.IsProjectValid())

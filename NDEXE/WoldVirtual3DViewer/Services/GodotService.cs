@@ -9,12 +9,14 @@ namespace WoldVirtual3DViewer.Services
     public class GodotService
     {
         private readonly string _godotProjectPath;
-        private readonly string? _godotExecutablePath;
+        private string? _godotExecutablePath;
+        private readonly string _settingsPath;
 
         public GodotService()
         {
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            
+            _settingsPath = Path.Combine("D:", "woldvirtual3d", "NDEXE", "DTUSER", "godot_path.txt");
+
             // Determinar la ruta del proyecto Godot de forma relativa
             // 1. Intentar estructura de publicación (App/ -> woldvirtual3d/)
             string potentialProjectRoot = Path.GetFullPath(Path.Combine(baseDir, "../../"));
@@ -37,8 +39,19 @@ namespace WoldVirtual3DViewer.Services
             _godotExecutablePath = FindGodotExecutable();
         }
 
-        private static string? FindGodotExecutable()
+        private string? FindGodotExecutable()
         {
+            // 0. Verificar configuración guardada
+            if (File.Exists(_settingsPath))
+            {
+                try
+                {
+                    string savedPath = File.ReadAllText(_settingsPath).Trim();
+                    if (File.Exists(savedPath)) return savedPath;
+                }
+                catch { }
+            }
+
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             
             // 1. Buscar en carpeta 'Godot' junto al ejecutable del visor (Portátil)
@@ -50,6 +63,21 @@ namespace WoldVirtual3DViewer.Services
             if (File.Exists(upperGodot)) return Path.GetFullPath(upperGodot);
 
             return null;
+        }
+
+        public void SetGodotExecutablePath(string path)
+        {
+            if (File.Exists(path))
+            {
+                _godotExecutablePath = path;
+                try
+                {
+                    // Asegurar que el directorio existe
+                    Directory.CreateDirectory(Path.GetDirectoryName(_settingsPath)!);
+                    File.WriteAllText(_settingsPath, path);
+                }
+                catch { }
+            }
         }
 
         public async Task<bool> LaunchGodotSceneAsync(UserAccount userAccount)
