@@ -32,7 +32,7 @@ namespace WoldVirtual3DViewer.ViewModels
             set => _mainViewModel.ConfirmPassword = value;
         }
 
-        public AvatarInfo SelectedAvatar => _mainViewModel.SelectedAvatar;
+        public AvatarInfo? SelectedAvatar => _mainViewModel.SelectedAvatar;
         public string UserRegistrationStatus => _mainViewModel.UserRegistrationStatus;
         public bool IsUserRegistered => _mainViewModel.IsUserRegistered;
 

@@ -54,16 +54,31 @@ namespace WoldVirtual3DViewer.ViewModels
         {
             try
             {
-                // Inicialización mínima para debugging
-                AvailableAvatars = new ObservableCollection<AvatarInfo>();
-                CurrentView = new PCRegistrationViewModel(this);
+                // Inicializar servicios
+                _hardwareService = new HardwareService();
+                _dataService = new DataService();
+                _godotService = new GodotService();
 
-                // Mostrar mensaje de que la aplicación se inició correctamente
-                System.Windows.MessageBox.Show("WoldVirtual3D Viewer se inició correctamente!\n\nPresiona OK para continuar con la configuración completa.",
-                    "Debug: Aplicación Iniciada", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                // Inicializar comandos
+                RegisterPCCommand = new RelayCommand(async () => await RegisterPCAsync());
+                DownloadPCHashCommand = new RelayCommand(DownloadPCHash);
+                SelectAvatarCommand = new RelayCommand<AvatarInfo?>(SelectAvatar);
+                RegisterUserCommand = new RelayCommand(async () => await RegisterUserAsync());
+                DownloadUserHashCommand = new RelayCommand(DownloadUserHash);
+                LoginCommand = new RelayCommand(async () => await LoginAsync());
+                LogoutCommand = new RelayCommand(Logout);
 
-                // Ahora inicializar completamente
-                InitializeFullApplication();
+                // Inicializar colección de avatares
+                AvailableAvatars = new ObservableCollection<AvatarInfo>(AvatarInfo.GetAvailableAvatars());
+
+                // Seleccionar avatar por defecto
+                if (AvailableAvatars.Count > 0)
+                {
+                    SelectedAvatar = AvailableAvatars[0];
+                }
+
+                // Verificar estado inicial y establecer vista
+                CheckInitialState();
             }
             catch (Exception ex)
             {
@@ -74,45 +89,9 @@ namespace WoldVirtual3DViewer.ViewModels
             }
         }
 
-        private void InitializeFullApplication()
-        {
-            try
-            {
-                _hardwareService = new HardwareService();
-                _dataService = new DataService();
-                _godotService = new GodotService();
-
-                // Inicializar comandos
-                RegisterPCCommand = new RelayCommand(async () => await RegisterPCAsync());
-                DownloadPCHashCommand = new RelayCommand(DownloadPCHash);
-                SelectAvatarCommand = new RelayCommand<AvatarInfo>(SelectAvatar);
-                RegisterUserCommand = new RelayCommand(async () => await RegisterUserAsync());
-                DownloadUserHashCommand = new RelayCommand(DownloadUserHash);
-                LoginCommand = new RelayCommand(async () => await LoginAsync());
-                LogoutCommand = new RelayCommand(Logout);
-
-                // Inicializar colección de avatares completa
-                AvailableAvatars = new ObservableCollection<AvatarInfo>(AvatarInfo.GetAvailableAvatars());
-
-                // Seleccionar avatar por defecto (verificar que hay avatares disponibles)
-                if (AvailableAvatars.Count > 0)
-                {
-                    SelectedAvatar = AvailableAvatars[0]; // "chica"
-                }
-
-                // Verificar estado inicial
-                CheckInitialState();
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show($"Error en inicialización completa: {ex.Message}",
-                    "Error de Configuración", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
-            }
-        }
-
         #region Propiedades
 
-        public object CurrentView
+        public object? CurrentView
         {
             get => _currentView;
             set
@@ -124,7 +103,7 @@ namespace WoldVirtual3DViewer.ViewModels
 
         public ObservableCollection<AvatarInfo> AvailableAvatars { get; }
 
-        public AvatarInfo SelectedAvatar
+        public AvatarInfo? SelectedAvatar
         {
             get => _selectedAvatar;
             set
@@ -135,7 +114,7 @@ namespace WoldVirtual3DViewer.ViewModels
         }
 
         // PC Registration
-        public PCInfo PCInfo
+        public PCInfo? PCInfo
         {
             get => _pcInfo;
             set
@@ -338,8 +317,13 @@ namespace WoldVirtual3DViewer.ViewModels
             try
             {
                 PCRegistrationStatus = "Registrando PC...";
-                PCInfo = _hardwareService.GetPCInfo();
-                _dataService.SavePCInfo(PCInfo);
+                
+                await Task.Run(() => 
+                {
+                    PCInfo = _hardwareService.GetPCInfo();
+                    _dataService.SavePCInfo(PCInfo);
+                });
+
                 IsPCRegistered = true;
                 PCRegistrationStatus = "PC registrado exitosamente";
 
@@ -386,8 +370,9 @@ namespace WoldVirtual3DViewer.ViewModels
             }
         }
 
-        private void SelectAvatar(AvatarInfo avatar)
+        private void SelectAvatar(AvatarInfo? avatar)
         {
+            if (avatar == null) return;
             SelectedAvatar = avatar;
 
             // Cambiar a vista de registro de usuario
@@ -431,23 +416,26 @@ namespace WoldVirtual3DViewer.ViewModels
 
                 UserRegistrationStatus = "Registrando usuario...";
 
-                // Crear cuenta de usuario
-                var userAccount = new UserAccount
+                await Task.Run(() =>
                 {
-                    Username = Username,
-                    AvatarType = SelectedAvatar?.Type ?? "chica",
-                    PCUniqueHash = PCInfo.UniqueHash,
-                    IsValidated = true
-                };
+                    // Crear cuenta de usuario
+                    var userAccount = new UserAccount
+                    {
+                        Username = Username,
+                        AvatarType = SelectedAvatar?.Type ?? "chica",
+                        PCUniqueHash = PCInfo.UniqueHash,
+                        IsValidated = true
+                    };
 
-                userAccount.SetPassword(Password);
-                userAccount.GenerateAccountHash();
+                    userAccount.SetPassword(Password);
+                    userAccount.GenerateAccountHash();
 
-                // Guardar cuenta
-                _dataService.SaveUserAccount(userAccount);
-                _userAccount = userAccount;
+                    // Guardar cuenta
+                    _dataService.SaveUserAccount(userAccount);
+                    _userAccount = userAccount;
+                });
+
                 IsUserRegistered = true;
-
                 UserRegistrationStatus = "Usuario registrado exitosamente";
 
                 MessageBox.Show("Usuario registrado exitosamente. Ahora puede descargar el hash de su cuenta.", "Registro Exitoso", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -505,9 +493,19 @@ namespace WoldVirtual3DViewer.ViewModels
 
                 LoginStatus = "Iniciando sesión...";
 
-                if (_dataService.ValidateUserCredentials(LoginUsername, LoginPassword))
+                bool isValid = false;
+                
+                await Task.Run(() => 
                 {
-                    _userAccount = _dataService.GetValidatedUserAccount(LoginUsername);
+                    isValid = _dataService.ValidateUserCredentials(LoginUsername, LoginPassword);
+                    if (isValid)
+                    {
+                        _userAccount = _dataService.GetValidatedUserAccount(LoginUsername);
+                    }
+                });
+
+                if (isValid && _userAccount != null)
+                {
                     IsLoggedIn = true;
                     LoginStatus = "Inicio de sesión exitoso";
 

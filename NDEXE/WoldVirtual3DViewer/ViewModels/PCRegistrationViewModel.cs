@@ -13,7 +13,7 @@ namespace WoldVirtual3DViewer.ViewModels
         }
 
         // Propiedades delegadas al MainViewModel
-        public Models.PCInfo PCInfo => _mainViewModel.PCInfo;
+        public Models.PCInfo? PCInfo => _mainViewModel.PCInfo;
         public string PCRegistrationStatus => _mainViewModel.PCRegistrationStatus;
         public bool IsPCRegistered => _mainViewModel.IsPCRegistered;
 

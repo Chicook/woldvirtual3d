@@ -9,7 +9,7 @@ namespace WoldVirtual3DViewer.Services
     public class GodotService
     {
         private readonly string _godotProjectPath;
-        private readonly string _godotExecutablePath;
+        private readonly string? _godotExecutablePath;
 
         public GodotService()
         {
@@ -20,7 +20,7 @@ namespace WoldVirtual3DViewer.Services
             _godotExecutablePath = FindGodotExecutable();
         }
 
-        private string FindGodotExecutable()
+        private string? FindGodotExecutable()
         {
             // Posibles ubicaciones del ejecutable de Godot
             string[] possiblePaths = {
@@ -81,14 +81,14 @@ namespace WoldVirtual3DViewer.Services
                     CreateNoWindow = false,
                     EnvironmentVariables =
                     {
-                        ["WOLDVIRTUAL_USER"] = userAccount.Username,
+                        ["WOLDVIRTUAL_USER"] = userAccount.Username ?? "Unknown",
                         ["WOLDVIRTUAL_AVATAR"] = userAccount.AvatarType ?? "chica",
-                        ["WOLDVIRTUAL_ACCOUNT_HASH"] = userAccount.AccountHash
+                        ["WOLDVIRTUAL_ACCOUNT_HASH"] = userAccount.AccountHash ?? "NoHash"
                     }
                 };
 
                 // Iniciar Godot
-                Process godotProcess = Process.Start(startInfo);
+                Process? godotProcess = Process.Start(startInfo);
 
                 if (godotProcess != null)
                 {

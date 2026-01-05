@@ -16,7 +16,7 @@ namespace WoldVirtual3DViewer.ViewModels
 
         // Propiedades delegadas al MainViewModel
         public ObservableCollection<AvatarInfo> AvailableAvatars => _mainViewModel.AvailableAvatars;
-        public AvatarInfo SelectedAvatar => _mainViewModel.SelectedAvatar;
+        public AvatarInfo? SelectedAvatar => _mainViewModel.SelectedAvatar;
 
         // Comandos delegados
         public System.Windows.Input.ICommand SelectAvatarCommand => _mainViewModel.SelectAvatarCommand;
