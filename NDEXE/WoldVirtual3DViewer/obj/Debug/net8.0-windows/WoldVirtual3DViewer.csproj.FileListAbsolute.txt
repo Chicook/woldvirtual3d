@@ -54,3 +54,5 @@ D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\GeneratedInt
 D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\WoldVirtual3DViewer_MarkupCompile.lref
 D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Views\LoginView.baml
 D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Views\LoginView.g.cs
+D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Views\GameOverlayWindow.baml
+D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Views\GameOverlayWindow.g.cs

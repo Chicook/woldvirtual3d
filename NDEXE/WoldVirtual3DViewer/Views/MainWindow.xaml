@@ -9,9 +9,15 @@
             <RowDefinition Height="32"/>
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" Background="#2C2C2C">
-            <TextBlock Text="WoldVirtual3D Viewer" Foreground="White" VerticalAlignment="Center" Margin="12,0"/>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="Seleccionar Motor" Margin="8,4" Padding="8,0" Command="{Binding SelectEngineCommand}"/>
+            <Menu Background="Transparent" VerticalAlignment="Center" Margin="12,0">
+                <MenuItem Header="WoldVirtual3D Viewer" Foreground="White" FontSize="14" FontWeight="Bold"/>
+                <MenuItem Header="Preferencias" Foreground="White">
+                    <MenuItem Header="Seleccionar Motor" Command="{Binding SelectEngineCommand}"/>
+                </MenuItem>
+            </Menu>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="12,0">
+                <TextBlock Text="WVC Coin: " Foreground="#AAAAAA" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding WVCCoinBalance}" Foreground="#FFD700" FontWeight="Bold" VerticalAlignment="Center" Margin="5,0,0,0"/>
             </StackPanel>
         </DockPanel>
         <ContentControl Grid.Row="1" Content="{Binding CurrentView}"/>

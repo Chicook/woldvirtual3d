@@ -17,9 +17,16 @@ namespace WoldVirtual3DViewer.ViewModels
         }
         public RelayCommand SelectEngineCommand { get; }
         public RelayCommand EnterCommand { get; }
-        private readonly Services.GodotService _godotService = new Services.GodotService();
+        private readonly Services.GodotService _godotService = new();
         public string Username { get; set; } = "Usuario";
         public string Avatar { get; set; } = "chica";
+        private string _wvcCoinBalance = "0.000";
+        public string WVCCoinBalance
+        {
+            get => _wvcCoinBalance;
+            set => SetProperty(ref _wvcCoinBalance, value);
+        }
+
         public MainViewModel()
         {
             CurrentView = new WoldVirtual3DViewer.Views.LoginView { DataContext = this };

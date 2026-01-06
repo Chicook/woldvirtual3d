@@ -6,10 +6,5 @@ namespace WoldVirtual3DViewer.Views
         {
             InitializeComponent();
         }
-        public void InitializeComponent()
-        {
-            var uri = new System.Uri("/WoldVirtual3DViewer;component/Views/LoginView.xaml", System.UriKind.Relative);
-            System.Windows.Application.LoadComponent(this, uri);
-        }
     }
 }
