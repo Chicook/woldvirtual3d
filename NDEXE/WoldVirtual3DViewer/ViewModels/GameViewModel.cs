@@ -19,7 +19,10 @@ namespace WoldVirtual3DViewer.ViewModels
             set => SetProperty(ref _statusText, value);
         }
 
-        public ObservableCollection<ChatMessageItem> ChatMessages { get; } = new();
+        public ObservableCollection<ChatMessageItem> ChatMessages { get; } =
+        [
+            new ChatMessageItem { Content = "Bienvenido a WoldVirtual3D!" }
+        ];
         
         private string _chatInput = "";
         public string ChatInput
