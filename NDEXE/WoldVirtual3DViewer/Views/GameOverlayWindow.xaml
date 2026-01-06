@@ -1,0 +1,46 @@
+<Window x:Class="WoldVirtual3DViewer.Views.GameOverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="GameOverlay" Topmost="True" AllowsTransparency="True" WindowStyle="None" Background="{x:Null}" ShowInTaskbar="False">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Chat History (Bottom Left) -->
+        <Border Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="400" Height="250" Margin="20,0,0,20" Background="#99000000" CornerRadius="5" BorderBrush="#55FFFFFF" BorderThickness="1">
+            <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl ItemsSource="{Binding ChatMessages}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Content}" Foreground="White" TextWrapping="Wrap" Margin="8,2" FontSize="14">
+                                <TextBlock.Effect>
+                                    <DropShadowEffect ShadowDepth="1" BlurRadius="2" Color="Black"/>
+                                </TextBlock.Effect>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Chat Input Bar (Bottom) -->
+        <Border Grid.Row="1" Background="#CC000000" Padding="10" VerticalAlignment="Bottom">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Local Chat:" Foreground="#AAAAAA" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBox Grid.Column="1" Text="{Binding ChatInput, UpdateSourceTrigger=PropertyChanged}" Background="#33FFFFFF" Foreground="White" BorderThickness="1" BorderBrush="#555" Padding="5" CaretBrush="White">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding SendChatCommand}"/>
+                    </TextBox.InputBindings>
+                </TextBox>
+                <Button Grid.Column="2" Content="Enviar" Command="{Binding SendChatCommand}" Margin="10,0,0,0" Padding="15,5" Background="#444" Foreground="White" BorderThickness="0"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
