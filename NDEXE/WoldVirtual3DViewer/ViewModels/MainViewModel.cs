@@ -1,34 +1,24 @@
-using System;
-using System.Windows.Input;
-using WoldVirtual3DViewer.Services;
 using WoldVirtual3DViewer.Utils;
-
+using System.Windows.Controls;
 namespace WoldVirtual3DViewer.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
-        private readonly INavigationService _navigationService;
-        
-        public ViewModelBase? CurrentView => _navigationService.CurrentView;
-
-        public MainViewModel(INavigationService navigationService)
+        private string _statusText = "Listo";
+        public string StatusText
         {
-            _navigationService = navigationService;
-            _navigationService.CurrentViewChanged += OnCurrentViewChanged;
+            get => _statusText;
+            set => SetProperty(ref _statusText, value);
         }
-
-        private void OnCurrentViewChanged()
+        private object? _currentView;
+        public object? CurrentView
         {
-            OnPropertyChanged(nameof(CurrentView));
+            get => _currentView;
+            set => SetProperty(ref _currentView, value);
         }
-
-        protected override void Dispose(bool disposing)
+        public MainViewModel()
         {
-            if (disposing)
-            {
-                _navigationService.CurrentViewChanged -= OnCurrentViewChanged;
-            }
-            base.Dispose(disposing);
+            CurrentView = new WoldVirtual3DViewer.Views.GameView();
         }
     }
 }
