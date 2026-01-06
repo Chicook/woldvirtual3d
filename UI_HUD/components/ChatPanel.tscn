@@ -1,0 +1,208 @@
+[gd_scene load_steps=8 format=3 uid="uid://dchatpanel001"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chat_bg"]
+bg_color = Color(0.03, 0.04, 0.06, 0.88)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.45, 0.7, 0.6)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0, 0, 0, 0.3)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chat_header"]
+bg_color = Color(0.08, 0.12, 0.18, 0.95)
+border_width_bottom = 1
+border_color = Color(0.3, 0.5, 0.75, 0.5)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chat_messages"]
+bg_color = Color(0.02, 0.03, 0.05, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.3, 0.45, 0.4)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_input_bg"]
+bg_color = Color(0.06, 0.08, 0.12, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.5, 0.75, 0.6)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_send_btn"]
+bg_color = Color(0.15, 0.4, 0.65, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.6, 0.9, 0.7)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_send_btn_hover"]
+bg_color = Color(0.2, 0.5, 0.8, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.7, 1.0, 0.9)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_btn"]
+bg_color = Color(0.1, 0.12, 0.16, 0.8)
+border_width_bottom = 2
+border_color = Color(0.2, 0.4, 0.6, 0.5)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+
+[node name="ChatPanel" type="PanelContainer"]
+custom_minimum_size = Vector2(380, 220)
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -290.0
+offset_right = 392.0
+offset_bottom = -70.0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_chat_bg")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Header" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_chat_header")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Header"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ChatIcon" type="Label" parent="VBoxContainer/Header/HBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "💬"
+
+[node name="Title" type="Label" parent="VBoxContainer/Header/HBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 12
+text = "CHAT"
+
+[node name="Spacer" type="Control" parent="VBoxContainer/Header/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TabLocal" type="Button" parent="VBoxContainer/Header/HBoxContainer"]
+custom_minimum_size = Vector2(55, 24)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 10
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_btn")
+text = "Local"
+
+[node name="TabRegion" type="Button" parent="VBoxContainer/Header/HBoxContainer"]
+custom_minimum_size = Vector2(55, 24)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 0.8)
+theme_override_font_sizes/font_size = 10
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_btn")
+text = "Región"
+
+[node name="TabIM" type="Button" parent="VBoxContainer/Header/HBoxContainer"]
+custom_minimum_size = Vector2(40, 24)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 0.8)
+theme_override_font_sizes/font_size = 10
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_btn")
+text = "IM"
+
+[node name="CloseBtn" type="Button" parent="VBoxContainer/Header/HBoxContainer"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.5, 0.5, 1)
+theme_override_font_sizes/font_size = 12
+text = "×"
+flat = true
+
+[node name="MessagesContainer" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_chat_messages")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/MessagesContainer"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="MessagesVBox" type="VBoxContainer" parent="VBoxContainer/MessagesContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 4
+
+[node name="WelcomeMsg" type="RichTextLabel" parent="VBoxContainer/MessagesContainer/ScrollContainer/MessagesVBox"]
+layout_mode = 2
+theme_override_colors/default_color = Color(0.6, 0.75, 0.9, 0.9)
+theme_override_font_sizes/normal_font_size = 11
+bbcode_enabled = true
+text = "[color=#5588aa][Sistema][/color] Bienvenido a WoldVirtual3D"
+fit_content = true
+
+[node name="InfoMsg" type="RichTextLabel" parent="VBoxContainer/MessagesContainer/ScrollContainer/MessagesVBox"]
+layout_mode = 2
+theme_override_colors/default_color = Color(0.7, 0.8, 0.85, 0.85)
+theme_override_font_sizes/normal_font_size = 11
+bbcode_enabled = true
+text = "[color=#6699bb][Sistema][/color] Pulsa Enter para chatear"
+fit_content = true
+
+[node name="InputContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="MessageInput" type="LineEdit" parent="VBoxContainer/InputContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.92, 0.95, 1)
+theme_override_colors/font_placeholder_color = Color(0.5, 0.55, 0.6, 0.7)
+theme_override_styles/normal = SubResource("StyleBoxFlat_input_bg")
+placeholder_text = "Escribe un mensaje..."
+
+[node name="SendBtn" type="Button" parent="VBoxContainer/InputContainer"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.97, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_send_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_send_btn_hover")
+text = "Enviar"

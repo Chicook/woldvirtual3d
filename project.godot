@@ -1,0 +1,23 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="woldvirtualGD"
+run/main_scene="uid://sfku2ubt2xi2"
+config/features=PackedStringArray("4.5", "Forward Plus")
+
+[autoload]
+
+IslandManager="*res://GDSCRIP/IslandManager.gd"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/terrain_3d/plugin.cfg")
