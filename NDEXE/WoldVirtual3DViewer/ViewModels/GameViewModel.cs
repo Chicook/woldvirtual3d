@@ -45,7 +45,7 @@ namespace WoldVirtual3DViewer.ViewModels
         }
 
         // Colección para mensajes temporales
-        public ObservableCollection<ChatMessageItem> ChatHistory { get; } = new ObservableCollection<ChatMessageItem>();
+        public ObservableCollection<ChatMessageItem> ChatHistory { get; } = [];
 
         private bool _isChatVisible = true;
         public bool IsChatVisible
@@ -91,7 +91,7 @@ namespace WoldVirtual3DViewer.ViewModels
             FocusGame(); // Devolver foco al juego al cerrar/abrir
         }
 
-        private void RunOnUIThread(Action action)
+        private static void RunOnUIThread(Action action)
         {
             if (System.Windows.Application.Current != null)
             {
