@@ -81,7 +81,7 @@ namespace WoldVirtual3DViewer.ViewModels
             // 2. Foco explícito a la ventana de Godot (Win32)
             if (_godotHandle != IntPtr.Zero)
             {
-                _godotService.FocusWindow(_godotHandle);
+                GodotService.FocusWindow(_godotHandle);
             }
         }
 
@@ -174,7 +174,7 @@ namespace WoldVirtual3DViewer.ViewModels
                         // Pequeño delay para asegurar que Godot creó su ventana completamente
                         await Task.Delay(500); 
                         
-                        _godotService.EmbedWindow(_godotHandle, _hostControl.Handle);
+                        GodotService.EmbedWindow(_godotHandle, _hostControl.Handle);
                         
                         // Ajustar tamaño inicial
                         ResizeGame();
@@ -201,7 +201,7 @@ namespace WoldVirtual3DViewer.ViewModels
         {
             if (_godotHandle != IntPtr.Zero && _hostControl != null)
             {
-                _godotService.ResizeEmbeddedWindow(_godotHandle, _hostControl.Width, _hostControl.Height);
+                GodotService.ResizeEmbeddedWindow(_godotHandle, _hostControl.Width, _hostControl.Height);
             }
         }
 
