@@ -1,0 +1,23 @@
+<UserControl x:Class="WoldVirtual3DViewer.Views.LoginView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,8">
+            <TextBlock Text="Usuario:" Foreground="White" VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <TextBox Width="240" Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,0,0,8">
+            <TextBlock Text="Avatar:" Foreground="White" VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <ComboBox Width="240" SelectedItem="{Binding Avatar, Mode=TwoWay}">
+                <ComboBoxItem Content="chica"/>
+                <ComboBoxItem Content="chico"/>
+            </ComboBox>
+        </StackPanel>
+        <Button Grid.Row="2" Content="Entrar" Width="120" Height="32" Command="{Binding EnterCommand}"/>
+    </Grid>
+</UserControl>

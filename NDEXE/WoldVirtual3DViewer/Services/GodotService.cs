@@ -10,11 +10,14 @@ namespace WoldVirtual3DViewer.Services
     {
         public string? GodotExePath { get; private set; }
         public string? ProjectPath { get; private set; }
+        private readonly string _settingsPath;
 
         public GodotService()
         {
             ProjectPath = FindProjectRoot();
             GodotExePath = FindGodotExecutable();
+            var la = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            _settingsPath = Path.Combine(la, "WoldVirtual3D", "godot_path.txt");
         }
 
         public async Task<Process?> LaunchAsync(string sceneName, string? user = null, string? avatar = null)
@@ -47,7 +50,21 @@ namespace WoldVirtual3DViewer.Services
             return p;
         }
 
-        private string? FindProjectRoot()
+        public void SetGodotExecutablePath(string path)
+        {
+            if (File.Exists(path))
+            {
+                GodotExePath = path;
+                try
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(_settingsPath)!);
+                    File.WriteAllText(_settingsPath, path);
+                }
+                catch { }
+            }
+        }
+
+        private static string? FindProjectRoot()
         {
             string dir = AppDomain.CurrentDomain.BaseDirectory;
             var current = new DirectoryInfo(dir);
@@ -63,7 +80,7 @@ namespace WoldVirtual3DViewer.Services
             return null;
         }
 
-        private string? FindGodotExecutable()
+        private static string? FindGodotExecutable()
         {
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string engineDir = Path.Combine(baseDir, "Engine");
@@ -80,12 +97,11 @@ namespace WoldVirtual3DViewer.Services
                 var path = File.ReadAllText(saved).Trim();
                 if (File.Exists(path)) return path;
             }
-            string[] roots =
-            {
+            string[] roots = [
                 Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
                 Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
-            };
+            ];
             foreach (var r in roots)
             {
                 var d = Path.Combine(r, "Godot");

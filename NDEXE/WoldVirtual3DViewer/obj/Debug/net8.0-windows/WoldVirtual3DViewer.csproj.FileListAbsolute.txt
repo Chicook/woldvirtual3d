@@ -52,3 +52,5 @@ D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\WoldVirtual3
 D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\ref\WoldVirtual3DViewer.dll
 D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\GeneratedInternalTypeHelper.g.cs
 D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\WoldVirtual3DViewer_MarkupCompile.lref
+D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Views\LoginView.baml
+D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\Views\LoginView.g.cs
