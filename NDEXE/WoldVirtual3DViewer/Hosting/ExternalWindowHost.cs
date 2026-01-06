@@ -7,7 +7,7 @@ namespace WoldVirtual3DViewer.Hosting
 {
     public partial class ExternalWindowHost : HwndHost
     {
-        [LibraryImport("user32.dll", SetLastError = true, EntryPoint = "CreateWindowExW")]
+        [LibraryImport("user32.dll", SetLastError = true, EntryPoint = "CreateWindowExW", StringMarshalling = StringMarshalling.Utf16)]
         private static partial IntPtr CreateWindowEx(int exStyle, string lpClassName, string lpWindowName, int dwStyle, int x, int y, int nWidth, int nHeight, IntPtr hWndParent, IntPtr hMenu, IntPtr hInstance, IntPtr lpParam);
 
         [LibraryImport("user32.dll", SetLastError = true)]
