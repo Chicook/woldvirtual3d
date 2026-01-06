@@ -46,7 +46,7 @@ namespace WoldVirtual3DViewer.Views
                     _overlayWindow.Owner = parentWindow;
                     
                     // Sincronizar tamaño y posición inicial
-                    SyncOverlayPosition(parentWindow);
+                    SyncOverlayPosition();
 
                     // Eventos para seguir a la ventana principal
                     parentWindow.LocationChanged += ParentWindow_LocationChanged;
@@ -60,7 +60,7 @@ namespace WoldVirtual3DViewer.Views
             }
         }
 
-        private void SyncOverlayPosition(Window parent)
+        private void SyncOverlayPosition()
         {
             if (_overlayWindow == null) return;
 
@@ -78,12 +78,12 @@ namespace WoldVirtual3DViewer.Views
 
         private void ParentWindow_LocationChanged(object? sender, System.EventArgs e)
         {
-            if (sender is Window w) SyncOverlayPosition(w);
+            if (sender is Window) SyncOverlayPosition();
         }
 
         private void ParentWindow_SizeChanged(object sender, System.Windows.SizeChangedEventArgs e)
         {
-            if (sender is Window w) SyncOverlayPosition(w);
+            if (sender is Window) SyncOverlayPosition();
         }
 
         private void ParentWindow_StateChanged(object? sender, System.EventArgs e)

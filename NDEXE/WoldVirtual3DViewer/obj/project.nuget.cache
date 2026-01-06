@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "/wVCsuXYdqc=",
+  "dgSpecHash": "nxILo/s2t40=",
   "success": true,
-  "projectFilePath": "d:\\woldvirtual3d\\NDEXE\\WoldVirtual3DViewer\\WoldVirtual3DViewer.csproj",
+  "projectFilePath": "D:\\woldvirtual3d\\NDEXE\\WoldVirtual3DViewer\\WoldVirtual3DViewer.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.extensions.configuration\\8.0.0\\microsoft.extensions.configuration.8.0.0.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\8.0.0\\microsoft.extensions.configuration.abstractions.8.0.0.nupkg.sha512",

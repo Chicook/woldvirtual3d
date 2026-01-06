@@ -8,32 +8,30 @@ using WoldVirtual3DViewer.Models;
 
 namespace WoldVirtual3DViewer.Services
 {
-    public class GodotService
+    public partial class GodotService
     {
         // P/Invoke
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
+        [LibraryImport("user32.dll", SetLastError = true)]
+        private static partial IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
 
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
+        [LibraryImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static partial bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, [MarshalAs(UnmanagedType.Bool)] bool bRepaint);
 
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+        [LibraryImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static partial bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
-        [DllImport("user32.dll")]
-        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+        [LibraryImport("user32.dll", EntryPoint = "SetWindowLongA")]
+        private static partial int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
-        [DllImport("user32.dll")]
-        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+        [LibraryImport("user32.dll", EntryPoint = "GetWindowLongA")]
+        private static partial int GetWindowLong(IntPtr hWnd, int nIndex);
 
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern IntPtr SetFocus(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        private static extern bool SetForegroundWindow(IntPtr hWnd);
+        [LibraryImport("user32.dll", SetLastError = true)]
+        private static partial IntPtr SetFocus(IntPtr hWnd);
 
         private const int GWL_STYLE = -16;
-        private const int WS_VISIBLE = 0x10000000;
         private const int WS_CHILD = 0x40000000;
 
         private readonly string _godotProjectPath;
@@ -43,7 +41,9 @@ namespace WoldVirtual3DViewer.Services
         public GodotService()
         {
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            _settingsPath = Path.Combine("D:", "woldvirtual3d", "NDEXE", "DTUSER", "godot_path.txt");
+            // Guardar configuración en AppData local en lugar de una ruta fija
+            string appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            _settingsPath = Path.Combine(appData, "WoldVirtual3D", "godot_path.txt");
 
             // Determinar la ruta del proyecto Godot buscando hacia arriba
             string currentDir = baseDir;
@@ -64,21 +64,10 @@ namespace WoldVirtual3DViewer.Services
                 currentDir = parent.FullName;
             }
 
-            // Estrategia 2: Intentar ruta absoluta fija (Hardcoded Fallback)
+            // Estrategia 2: Si no se encuentra, asumir el directorio base (para portabilidad)
             if (!found)
             {
-                string hardcodedPath = @"D:\woldvirtual3d";
-                if (File.Exists(Path.Combine(hardcodedPath, "project.godot")))
-                {
-                    foundPath = hardcodedPath;
-                    found = true;
-                }
-            }
-
-            // Estrategia 3: Si todo falla, asignar la ruta fija por defecto
-            if (!found)
-            {
-                foundPath = @"D:\woldvirtual3d";
+                foundPath = baseDir;
             }
 
             _godotProjectPath = foundPath;
@@ -181,13 +170,12 @@ namespace WoldVirtual3DViewer.Services
 
         private const int WS_CAPTION = 0x00C00000;
         private const int WS_THICKFRAME = 0x00040000;
-        private const int WS_POPUP = -2147483648; // 0x80000000
         private const uint SWP_FRAMECHANGED = 0x0020;
         private const uint SWP_NOMOVE = 0x0002;
         private const uint SWP_NOSIZE = 0x0001;
         private const uint SWP_NOZORDER = 0x0004;
 
-        public void EmbedWindow(IntPtr childHandle, IntPtr parentHandle)
+        public static void EmbedWindow(IntPtr childHandle, IntPtr parentHandle)
         {
             if (childHandle == IntPtr.Zero || parentHandle == IntPtr.Zero) return;
 
@@ -198,7 +186,13 @@ namespace WoldVirtual3DViewer.Services
             style = style & ~WS_CAPTION & ~WS_THICKFRAME; // Quitar título y bordes redimensionables
             style |= WS_CHILD; // Añadir estilo hijo
             
-            SetWindowLong(childHandle, GWL_STYLE, style);
+            int result = SetWindowLong(childHandle, GWL_STYLE, style);
+            if (result == 0)
+            {
+                // Error al establecer estilo (o el estilo anterior era 0, que es raro pero posible)
+                // En un escenario estricto podríamos lanzar excepción, pero loguearemos o ignoraremos si no es crítico.
+                // throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+            }
 
             // Establecer padre
             SetParent(childHandle, parentHandle);
@@ -207,12 +201,12 @@ namespace WoldVirtual3DViewer.Services
             SetWindowPos(childHandle, IntPtr.Zero, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER);
         }
 
-        public void ResizeEmbeddedWindow(IntPtr childHandle, int width, int height)
+        public static void ResizeEmbeddedWindow(IntPtr childHandle, int width, int height)
         {
             MoveWindow(childHandle, 0, 0, width, height, true);
         }
 
-        public void FocusWindow(IntPtr hWnd)
+        public static void FocusWindow(IntPtr hWnd)
         {
             if (hWnd != IntPtr.Zero)
             {

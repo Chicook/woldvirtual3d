@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\
+D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\obj\Debug\net8.0-windows\
 WoldVirtual3DViewer
 none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
-d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\App.xaml
+D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\App.xaml
 9-2127814295
 
-36952382238
+35-1261241380
 236-1172597204
 Themes\DarkTheme.xaml;Views\AvatarSelectionView.xaml;Views\GameOverlayWindow.xaml;Views\GameView.xaml;Views\LoadingView.xaml;Views\LoginView.xaml;Views\MainWindow.xaml;Views\PCRegistrationView.xaml;Views\UserRegistrationView.xaml;
 
-True
+False
 

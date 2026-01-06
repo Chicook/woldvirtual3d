@@ -10,7 +10,6 @@ namespace WoldVirtual3DViewer.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             bool boolValue = (bool)value;
-            string? param = parameter as string;
 
             if (boolValue)
             {
