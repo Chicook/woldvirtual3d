@@ -2,3 +2,23 @@
 Exception: No se encontró el ejecutable de Godot.
 StackTrace:    at WoldVirtual3DViewer.Services.GodotService.LaunchGodotForEmbeddingAsync(UserAccount userAccount) in D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\Services\GodotService.cs:line 136
    at WoldVirtual3DViewer.ViewModels.GameViewModel.StartGodotAsync() in D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\ViewModels\GameViewModel.cs:line 165
+2026-01-06 01:22:20 - ERROR: Game start error
+Exception: No se encontró el ejecutable de Godot.
+StackTrace:    at WoldVirtual3DViewer.Services.GodotService.LaunchGodotForEmbeddingAsync(UserAccount userAccount) in D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\Services\GodotService.cs:line 136
+   at WoldVirtual3DViewer.ViewModels.GameViewModel.StartGodotAsync() in D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\ViewModels\GameViewModel.cs:line 165
+2026-01-06 01:25:13 - ERROR: Game start error
+Exception: No se encontró el ejecutable de Godot.
+StackTrace:    at WoldVirtual3DViewer.Services.GodotService.LaunchGodotForEmbeddingAsync(UserAccount userAccount) in D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\Services\GodotService.cs:line 136
+   at WoldVirtual3DViewer.ViewModels.GameViewModel.StartGodotAsync() in D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\ViewModels\GameViewModel.cs:line 165
+2026-01-06 01:27:25 - ERROR: Game start error
+Exception: No se encontró el ejecutable de Godot.
+StackTrace:    at WoldVirtual3DViewer.Services.GodotService.LaunchGodotForEmbeddingAsync(UserAccount userAccount) in D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\Services\GodotService.cs:line 136
+   at WoldVirtual3DViewer.ViewModels.GameViewModel.StartGodotAsync() in D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\ViewModels\GameViewModel.cs:line 165
+2026-01-06 01:32:09 - ERROR: Game start error
+Exception: No se encontró el ejecutable de Godot.
+StackTrace:    at WoldVirtual3DViewer.Services.GodotService.LaunchGodotForEmbeddingAsync(UserAccount userAccount) in D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\Services\GodotService.cs:line 136
+   at WoldVirtual3DViewer.ViewModels.GameViewModel.StartGodotAsync() in D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\ViewModels\GameViewModel.cs:line 165
+2026-01-06 01:35:19 - ERROR: Game start error
+Exception: No se encontró el ejecutable de Godot.
+StackTrace:    at WoldVirtual3DViewer.Services.GodotService.LaunchGodotForEmbeddingAsync(UserAccount userAccount) in D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\Services\GodotService.cs:line 136
+   at WoldVirtual3DViewer.ViewModels.GameViewModel.StartGodotAsync() in D:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\ViewModels\GameViewModel.cs:line 165

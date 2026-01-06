@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms; // Necesario para la integración con Panel si se usa, o IntPtr
 using WoldVirtual3DViewer.Models;
+using WoldVirtual3DViewer.Utils;
 
 namespace WoldVirtual3DViewer.Services
 {
@@ -21,6 +22,17 @@ namespace WoldVirtual3DViewer.Services
         [LibraryImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static partial bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+        [LibraryImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static partial bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        [LibraryImport("user32.dll", EntryPoint = "SendMessageW", SetLastError = true)]
+        private static partial IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        [LibraryImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static partial bool UpdateWindow(IntPtr hWnd);
 
         [LibraryImport("user32.dll", EntryPoint = "SetWindowLongA")]
         private static partial int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
@@ -113,6 +125,51 @@ namespace WoldVirtual3DViewer.Services
                 catch { }
             }
 
+            // 4. Buscar en ubicaciones estándar del sistema
+            string pf = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            string pf86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            string la = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string[] candidates = new[]
+            {
+                Path.Combine(pf, "Godot"),
+                Path.Combine(pf86, "Godot"),
+                Path.Combine(la, "Godot")
+            };
+            foreach (var dir in candidates)
+            {
+                if (Directory.Exists(dir))
+                {
+                    var exe = Path.Combine(dir, "Godot.exe");
+                    if (File.Exists(exe)) return exe;
+                    foreach (var file in Directory.GetFiles(dir, "Godot*.exe"))
+                    {
+                        return file;
+                    }
+                    foreach (var file in Directory.GetFiles(dir, "godot*.exe"))
+                    {
+                        return file;
+                    }
+                }
+            }
+
+            // 5. Buscar en directorios del PATH
+            var pathEnv = Environment.GetEnvironmentVariable("PATH");
+            if (!string.IsNullOrEmpty(pathEnv))
+            {
+                foreach (var p in pathEnv.Split(';'))
+                {
+                    try
+                    {
+                        if (string.IsNullOrWhiteSpace(p)) continue;
+                        var exe = Path.Combine(p.Trim(), "godot.exe");
+                        if (File.Exists(exe)) return exe;
+                        exe = Path.Combine(p.Trim(), "Godot.exe");
+                        if (File.Exists(exe)) return exe;
+                    }
+                    catch { }
+                }
+            }
+
             return null;
         }
 
@@ -141,7 +198,7 @@ namespace WoldVirtual3DViewer.Services
              var startInfo = new ProcessStartInfo
              {
                  FileName = _godotExecutablePath,
-                 Arguments = $"--path \"{_godotProjectPath}\" \"{scenePath}\" --user \"{userAccount.Username}\" --avatar \"{userAccount.AvatarType}\" --windowed --borderless",
+                 Arguments = $"--path \"{_godotProjectPath}\" \"{scenePath}\" --user \"{userAccount.Username}\" --avatar \"{userAccount.AvatarType}\" --windowed --borderless --rendering-driver opengl3 --single-window --verbose",
                  WorkingDirectory = _godotProjectPath,
                  UseShellExecute = false,
                  CreateNoWindow = false
@@ -157,6 +214,7 @@ namespace WoldVirtual3DViewer.Services
                  // Esperar a que la ventana tenga un Handle
                  await Task.Run(async () => 
                  {
+                    try { process.WaitForInputIdle(5000); } catch { }
                      while (process.MainWindowHandle == IntPtr.Zero)
                      {
                          await Task.Delay(100);
@@ -174,36 +232,56 @@ namespace WoldVirtual3DViewer.Services
         private const uint SWP_NOMOVE = 0x0002;
         private const uint SWP_NOSIZE = 0x0001;
         private const uint SWP_NOZORDER = 0x0004;
+        private const uint SWP_SHOWWINDOW = 0x0040;
+        private const int SW_SHOW = 5;
+        private const uint WM_SIZE = 0x0005;
 
         public static void EmbedWindow(IntPtr childHandle, IntPtr parentHandle)
         {
             if (childHandle == IntPtr.Zero || parentHandle == IntPtr.Zero) return;
 
-            // Obtener estilo actual
-            int style = GetWindowLong(childHandle, GWL_STYLE);
-            
-            // Eliminar bordes, barra de título y convertir a child
-            style = style & ~WS_CAPTION & ~WS_THICKFRAME; // Quitar título y bordes redimensionables
-            style |= WS_CHILD; // Añadir estilo hijo
-            
-            int result = SetWindowLong(childHandle, GWL_STYLE, style);
-            if (result == 0)
+            if (!IsNoStyleChangeEnabled())
             {
-                // Error al establecer estilo (o el estilo anterior era 0, que es raro pero posible)
-                // En un escenario estricto podríamos lanzar excepción, pero loguearemos o ignoraremos si no es crítico.
-                // throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+                int style = GetWindowLong(childHandle, GWL_STYLE);
+                style = style & ~WS_CAPTION & ~WS_THICKFRAME;
+                style |= WS_CHILD;
+                
+                int result = SetWindowLong(childHandle, GWL_STYLE, style);
+                if (result == 0)
+                {
+                }
             }
 
-            // Establecer padre
+            Logger.Log("Embedding window");
             SetParent(childHandle, parentHandle);
 
-            // Forzar actualización del estilo (Frame Changed)
-            SetWindowPos(childHandle, IntPtr.Zero, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER);
+            SetWindowPos(childHandle, IntPtr.Zero, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW);
+            ShowWindow(childHandle, SW_SHOW);
+            Logger.Log("Embedded and shown");
+        }
+
+        public static bool IsNoEmbedDiagnosticEnabled()
+        {
+            var v = Environment.GetEnvironmentVariable("WOLDVIRTUAL_NO_EMBED");
+            if (string.IsNullOrEmpty(v)) return false;
+            v = v.ToLowerInvariant();
+            return v == "1" || v == "true" || v == "yes";
+        }
+
+        public static bool IsNoStyleChangeEnabled()
+        {
+            var v = Environment.GetEnvironmentVariable("WOLDVIRTUAL_NO_STYLE");
+            if (string.IsNullOrEmpty(v)) return false;
+            v = v.ToLowerInvariant();
+            return v == "1" || v == "true" || v == "yes";
         }
 
         public static void ResizeEmbeddedWindow(IntPtr childHandle, int width, int height)
         {
             MoveWindow(childHandle, 0, 0, width, height, true);
+            IntPtr lParam = (IntPtr)(((height & 0xFFFF) << 16) | (width & 0xFFFF));
+            SendMessage(childHandle, WM_SIZE, IntPtr.Zero, lParam);
+            UpdateWindow(childHandle);
         }
 
         public static void FocusWindow(IntPtr hWnd)

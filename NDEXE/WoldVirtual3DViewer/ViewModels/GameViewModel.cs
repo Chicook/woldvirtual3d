@@ -174,15 +174,40 @@ namespace WoldVirtual3DViewer.ViewModels
                         // Pequeño delay para asegurar que Godot creó su ventana completamente
                         await Task.Delay(500); 
                         
-                        GodotService.EmbedWindow(_godotHandle, _hostControl.Handle);
-                        
-                        // Ajustar tamaño inicial
-                        ResizeGame();
-                        
-                        StatusText = "Listo.";
+                        if (!GodotService.IsNoEmbedDiagnosticEnabled())
+                        {
+                            GodotService.EmbedWindow(_godotHandle, _hostControl.Handle);
+                            ResizeGame();
+                            StatusText = "Listo.";
+                        }
+                        else
+                        {
+                            StatusText = "Diagnóstico: ejecutando Godot sin embebido";
+                            Logger.Log("Diagnostic mode: skipping embed");
+                        }
                         
                         // Suscribirse al evento de redimensionado del host
                         _hostControl.SizeChanged += (s, e) => ResizeGame();
+
+                        _ = Task.Run(async () =>
+                        {
+                            var end = DateTime.UtcNow.AddSeconds(12);
+                            while (DateTime.UtcNow < end)
+                            {
+                                if (_godotProcess == null || _godotProcess.HasExited) break;
+                                _godotProcess.Refresh();
+                                var h = _godotProcess.MainWindowHandle;
+                                if (!GodotService.IsNoEmbedDiagnosticEnabled() && h != IntPtr.Zero && h != _godotHandle && _hostControl != null)
+                                {
+                                    _godotHandle = h;
+                                    Logger.Log("Re-embedding after handle change");
+                                    GodotService.EmbedWindow(_godotHandle, _hostControl.Handle);
+                                    ResizeGame();
+                                    break;
+                                }
+                                await Task.Delay(500);
+                            }
+                        });
                     }
                 }
                 else
