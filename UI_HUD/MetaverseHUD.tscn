@@ -1,56 +1,33 @@
-[gd_scene load_steps=18 format=3 uid="uid://cmetaversehud001"]
+[gd_scene load_steps=11 format=3 uid="uid://e485vmtfqjfk"]
 
-[ext_resource type="Script" uid="uid://dmetaversehud_script" path="res://UI_HUD/scripts/MetaverseHUD.gd" id="1_hud"]
-[ext_resource type="Theme" uid="uid://dmetaverse_theme1" path="res://UI_HUD/themes/metaverse_theme.tres" id="2_theme"]
+[ext_resource type="Script" path="res://UI_HUD/scripts/MetaverseHUD.gd" id="1_hud"]
+[ext_resource type="Theme" path="res://UI_HUD/themes/metaverse_theme.tres" id="2_theme"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
-bg_color = Color(0.04, 0.05, 0.08, 0.92)
-border_width_bottom = 2
-border_color = Color(0.2, 0.45, 0.75, 0.6)
-shadow_color = Color(0, 0, 0, 0.4)
-shadow_size = 4
 content_margin_left = 12.0
 content_margin_top = 6.0
 content_margin_right = 12.0
 content_margin_bottom = 6.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bottombar"]
 bg_color = Color(0.04, 0.05, 0.08, 0.92)
-border_width_top = 2
+border_width_bottom = 2
 border_color = Color(0.2, 0.45, 0.75, 0.6)
 shadow_color = Color(0, 0, 0, 0.4)
 shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_separator"]
+content_margin_left = 1.0
+content_margin_right = 1.0
+bg_color = Color(0.3, 0.5, 0.75, 0.4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bottombar"]
 content_margin_left = 8.0
 content_margin_top = 6.0
 content_margin_right = 8.0
 content_margin_bottom = 6.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_minimap"]
-bg_color = Color(0.03, 0.05, 0.08, 0.9)
-border_width_left = 2
+bg_color = Color(0.04, 0.05, 0.08, 0.92)
 border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.25, 0.5, 0.8, 0.7)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0, 0, 0, 0.35)
-shadow_size = 5
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_avatar_panel"]
-bg_color = Color(0.04, 0.06, 0.1, 0.88)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.3, 0.55, 0.85, 0.6)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-shadow_color = Color(0, 0, 0, 0.3)
+border_color = Color(0.2, 0.45, 0.75, 0.6)
+shadow_color = Color(0, 0, 0, 0.4)
 shadow_size = 4
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
@@ -60,6 +37,18 @@ border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.3, 0.45, 0.65, 0.5)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+bg_color = Color(0.22, 0.42, 0.68, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.5, 0.75, 1, 0.9)
 corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_right = 5
@@ -77,63 +66,22 @@ corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
-bg_color = Color(0.22, 0.42, 0.68, 0.95)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.5, 0.75, 1.0, 0.9)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_separator"]
-bg_color = Color(0.3, 0.5, 0.75, 0.4)
-content_margin_left = 1.0
-content_margin_right = 1.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_health_bg"]
-bg_color = Color(0.1, 0.08, 0.08, 0.8)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.4, 0.2, 0.2, 0.5)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_health_fill"]
-bg_color = Color(0.2, 0.7, 0.3, 0.9)
-corner_radius_top_left = 2
-corner_radius_top_right = 2
-corner_radius_bottom_right = 2
-corner_radius_bottom_left = 2
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_energy_bg"]
-bg_color = Color(0.08, 0.08, 0.12, 0.8)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.2, 0.3, 0.5, 0.5)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_energy_fill"]
-bg_color = Color(0.3, 0.5, 0.9, 0.9)
-corner_radius_top_left = 2
-corner_radius_top_right = 2
-corner_radius_bottom_right = 2
-corner_radius_bottom_left = 2
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_minimap"]
+bg_color = Color(0.03, 0.05, 0.08, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.25, 0.5, 0.8, 0.7)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 5
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_minimap_inner"]
-bg_color = Color(0.08, 0.12, 0.18, 1.0)
+bg_color = Color(0.08, 0.12, 0.18, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -185,12 +133,6 @@ text = "WoldVirtual3D"
 [node name="VSeparator" type="VSeparator" parent="TopBar/HBoxContainer"]
 layout_mode = 2
 theme_override_styles/separator = SubResource("StyleBoxFlat_separator")
-
-[node name="RegionIcon" type="Label" parent="TopBar/HBoxContainer"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.5, 0.8, 0.5, 1)
-theme_override_font_sizes/font_size = 16
-text = "📍"
 
 [node name="RegionLabel" type="Label" parent="TopBar/HBoxContainer"]
 unique_name_in_owner = true
@@ -257,52 +199,27 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_bottombar")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="BottomBar"]
 layout_mode = 2
-alignment = 1
 theme_override_constants/separation = 8
-
-[node name="BtnMove" type="Button" parent="BottomBar/HBoxContainer"]
-custom_minimum_size = Vector2(70, 40)
-layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-text = "🚶 Mover"
-flat = false
-
-[node name="BtnFly" type="Button" parent="BottomBar/HBoxContainer"]
-custom_minimum_size = Vector2(70, 40)
-layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-text = "🦅 Volar"
+alignment = 1
 
 [node name="VSeparator" type="VSeparator" parent="BottomBar/HBoxContainer"]
 modulate = Color(0.5, 0.7, 1, 0.4)
 layout_mode = 2
 
-[node name="BtnChat" type="Button" parent="BottomBar/HBoxContainer"]
-custom_minimum_size = Vector2(70, 40)
-layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
-text = "💬 Chat"
-
 [node name="BtnInventory" type="Button" parent="BottomBar/HBoxContainer"]
 custom_minimum_size = Vector2(85, 40)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 text = "📦 Inventario"
 
 [node name="BtnMap" type="Button" parent="BottomBar/HBoxContainer"]
 custom_minimum_size = Vector2(70, 40)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 text = "🗺 Mapa"
 
 [node name="VSeparator2" type="VSeparator" parent="BottomBar/HBoxContainer"]
@@ -313,16 +230,16 @@ layout_mode = 2
 custom_minimum_size = Vector2(80, 40)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 text = "🔨 Construir"
 
 [node name="BtnSearch" type="Button" parent="BottomBar/HBoxContainer"]
 custom_minimum_size = Vector2(70, 40)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 text = "🔍 Buscar"
 
 [node name="VSeparator3" type="VSeparator" parent="BottomBar/HBoxContainer"]
@@ -333,16 +250,16 @@ layout_mode = 2
 custom_minimum_size = Vector2(70, 40)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 text = "📷 Foto"
 
 [node name="BtnSettings" type="Button" parent="BottomBar/HBoxContainer"]
 custom_minimum_size = Vector2(50, 40)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 text = "⚙"
 
 [node name="MinimapPanel" type="PanelContainer" parent="."]
@@ -422,74 +339,6 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="AvatarStatusPanel" type="PanelContainer" parent="."]
-layout_mode = 1
-anchors_preset = 0
-offset_left = 12.0
-offset_top = 54.0
-offset_right = 182.0
-offset_bottom = 160.0
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_avatar_panel")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="AvatarStatusPanel"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="Header" type="Label" parent="AvatarStatusPanel/VBoxContainer"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.88, 1, 1)
-theme_override_font_sizes/font_size = 12
-text = "👤 ESTADO DEL AVATAR"
-
-[node name="HSeparator" type="HSeparator" parent="AvatarStatusPanel/VBoxContainer"]
-modulate = Color(0.4, 0.6, 0.9, 0.4)
-layout_mode = 2
-
-[node name="HealthContainer" type="HBoxContainer" parent="AvatarStatusPanel/VBoxContainer"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="AvatarStatusPanel/VBoxContainer/HealthContainer"]
-custom_minimum_size = Vector2(55, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.5, 0.9, 0.5, 1)
-theme_override_font_sizes/font_size = 11
-text = "❤ Vida"
-
-[node name="HealthBar" type="ProgressBar" parent="AvatarStatusPanel/VBoxContainer/HealthContainer"]
-custom_minimum_size = Vector2(90, 14)
-layout_mode = 2
-size_flags_vertical = 1
-theme_override_styles/background = SubResource("StyleBoxFlat_health_bg")
-theme_override_styles/fill = SubResource("StyleBoxFlat_health_fill")
-value = 100.0
-show_percentage = false
-
-[node name="EnergyContainer" type="HBoxContainer" parent="AvatarStatusPanel/VBoxContainer"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="AvatarStatusPanel/VBoxContainer/EnergyContainer"]
-custom_minimum_size = Vector2(55, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.5, 0.7, 1, 1)
-theme_override_font_sizes/font_size = 11
-text = "⚡ Energía"
-
-[node name="EnergyBar" type="ProgressBar" parent="AvatarStatusPanel/VBoxContainer/EnergyContainer"]
-custom_minimum_size = Vector2(90, 14)
-layout_mode = 2
-size_flags_vertical = 1
-theme_override_styles/background = SubResource("StyleBoxFlat_energy_bg")
-theme_override_styles/fill = SubResource("StyleBoxFlat_energy_fill")
-value = 85.0
-show_percentage = false
-
-[node name="SpeedLabel" type="Label" parent="AvatarStatusPanel/VBoxContainer"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 0.9)
-theme_override_font_sizes/font_size = 10
-text = "🏃 Velocidad: Normal"
-
 [node name="ControlsHint" type="PanelContainer" parent="."]
 visible = false
 layout_mode = 1
@@ -500,6 +349,7 @@ offset_left = 12.0
 offset_top = -130.0
 offset_right = 262.0
 offset_bottom = -68.0
+grow_vertical = 0
 
 [node name="Label" type="Label" parent="ControlsHint"]
 layout_mode = 2

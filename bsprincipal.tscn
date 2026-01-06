@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://ci8vo3dw7syx1" path="res://escenas/terrainUS1_3d.tscn" id="1_15o8j"]
 [ext_resource type="PackedScene" uid="uid://biea6whwfiaq8" path="res://user3D/avBS1_body_3d.tscn" id="2_iukyu"]
-[ext_resource type="PackedScene" uid="uid://cmetaversehud001" path="res://UI_HUD/MetaverseHUD.tscn" id="3_hud"]
+[ext_resource type="PackedScene" uid="uid://e485vmtfqjfk" path="res://UI_HUD/MetaverseHUD.tscn" id="3_hud"]
 
 [node name="r3D" type="Node3D"]
 
@@ -16,3 +16,8 @@ input_capture_on_drag = true
 floor_constant_speed = true
 
 [node name="MetaverseHUD" parent="." instance=ExtResource("3_hud")]
+anchors_preset = -1
+anchor_left = 0.001
+anchor_bottom = 0.957
+offset_left = -0.15200007
+offset_bottom = 0.8640137
