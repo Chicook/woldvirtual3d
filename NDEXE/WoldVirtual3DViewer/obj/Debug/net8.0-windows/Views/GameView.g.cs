@@ -61,7 +61,7 @@ namespace WoldVirtual3DViewer.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/WoldVirtual3DViewer;component/views/gameview.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/WoldVirtual3DViewer;V1.0.0.0;component/views/gameview.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\GameView.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

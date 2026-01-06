@@ -52,7 +52,7 @@ namespace WoldVirtual3DViewer.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/WoldVirtual3DViewer;component/views/gameoverlaywindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/WoldVirtual3DViewer;V1.0.0.0;component/views/gameoverlaywindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\GameOverlayWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

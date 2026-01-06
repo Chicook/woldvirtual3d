@@ -1,5 +1,5 @@
 ﻿WoldVirtual3DViewer
-
+1.0.0.0
 
 winexe
 C#
@@ -12,9 +12,9 @@ TRACE;DEBUG;NET;NET8_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR
 d:\woldvirtual3d\NDEXE\WoldVirtual3DViewer\App.xaml
 4-1551138756
 
-141183452995
+168368405
 2351556004258
 Views\GameOverlayWindow.xaml;Views\GameView.xaml;Views\LoginView.xaml;Views\MainWindow.xaml;
 
-False
+True
 
